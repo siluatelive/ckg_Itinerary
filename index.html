@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSV Search App</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Use PapaParse from CDN for robust CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+  <main>
+    <h1>CSV Search App</h1>
+
+    <section class="controls">
+      <label for="fileInput">Load CSV file (or use included Book1.csv):</label>
+      <input id="fileInput" type="file" accept=".csv" />
+
+      <div class="or">— OR —</div>
+      <button id="useDefault">Use included Book1.csv</button>
+    </section>
+
+    <section class="search">
+      <input id="query" placeholder="Type to search (matches any column)" />
+      <label><input id="wholeWord" type="checkbox" /> Whole word</label>
+      <label for="columnSelect">Column:</label>
+      <select id="columnSelect">
+        <option value="__any__">Any column</option>
+      </select>
+      <button id="clear">Clear</button>
+    </section>
+
+    <section id="stats" class="hidden"></section>
+
+    <section id="tableWrap">
+      <table id="results">
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+
+    <footer>
+      <p>Built to demo client-side CSV search and easy GitHub Pages deployment.</p>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

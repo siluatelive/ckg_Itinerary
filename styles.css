@@ -48,6 +48,20 @@ input:focus, select:focus{outline:2px solid rgba(15,98,254,0.12);border-color:va
 .btn-primary{background:var(--accent);color:#fff}
 .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
 
+.btn-small{padding:6px 8px;font-size:13px;border-radius:8px}
+
+/* Input row: query input + clear button */
+.input-row{display:flex;gap:8px;align-items:center}
+.input-row input{flex:1}
+
+/* Table cells: allow wrapping long text and breaking long words */
+#results td, #results th{
+	white-space:normal!important;
+	word-break:break-word;
+	overflow-wrap:anywhere;
+	vertical-align:top;
+}
+
 #results{width:100%;border-collapse:collapse;margin-top:12px;background:transparent}
 #results th,#results td{padding:12px;border-bottom:1px solid var(--border);text-align:left}
 #results thead th{background:transparent;color:var(--muted);font-weight:600}

@@ -35,14 +35,11 @@
           <section class="card search-card" aria-labelledby="search-heading">
             <h2 id="search-heading" class="sr-only">ค้นหา</h2>
 
-            <form class="search-grid" onsubmit="applySearch(); return false;">
-              <div class="field full">
-                <label for="query" class="label">ค้นหา</label>
-                <div class="input-row">
-                  <input id="query" placeholder="พิมพ์เพื่อค้นหา (ค้นทุกคอลัมน์)" />
-                  <button id="clearQuery" type="button" class="btn btn-ghost btn-small" aria-label="ล้างคำค้น">✕</button>
-                </div>
-              </div>
+        <form class="search-grid" onsubmit="return false;">
+          <div class="field full">
+            <label for="query" class="label">ค้นหา</label>
+            <input id="query" placeholder="พิมพ์เพื่อค้นหา (ค้นทุกคอลัมน์)" />
+          </div>
 
               <div class="field small">
                 <label class="label"><input id="wholeWord" type="checkbox" /> ค้นทั้งคำ</label>

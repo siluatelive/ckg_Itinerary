@@ -452,4 +452,11 @@ if (clearBtn) clearBtn.addEventListener('click', ()=>{
   if (placeFilter) placeFilter.value = '';
   renderTable(data);
 });
+// inline clear for query field (improves UX)
+const clearQueryBtn = document.getElementById('clearQuery');
+if (clearQueryBtn) clearQueryBtn.addEventListener('click', ()=>{
+  queryInput.value = '';
+  applySearch();
+  queryInput.focus();
+});
 if (columnSelect) columnSelect.addEventListener('change', ()=> applySearch());

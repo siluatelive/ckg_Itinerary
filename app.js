@@ -4,6 +4,10 @@ let headers = [];
 let headerMap = {}; // map original header -> normalized key (date/place/details/transport/recommend)
 // Files to load and merge
 const dataFiles = ['Book1.csv', 'places_extra.csv'];
+// Synthetic source column header (Thai)
+const SOURCE_COL = 'แหล่งข้อมูล';
+const sourceFilter = document.getElementById('sourceFilter');
+const sourceTabs = document.getElementById('sourceTabs');
 
 const columnSelect = document.getElementById('columnSelect');
 const queryInput = document.getElementById('query');
@@ -218,8 +222,8 @@ function parseCsvText(text) {
 }
 
 // Helper: convert a Papa.parse result into header array and row objects
-function parseResultToRows(result){
-  if(!result || !result.data) return { headers: [], rows: [] };
+function parseResultToRows(result, source){
+  if(!result || !result.data) return { headers: [], rows: [], source };
   // basic cleanup: remove empty rows
   let parsed = result.data.filter(r => {
     if (!r) return false;
@@ -237,9 +241,11 @@ function parseResultToRows(result){
   const rows = parsed.map(r => {
     const out = {};
     hdrs.forEach(h => out[h] = r[h] ?? '');
+    // tag source so callers can use it
+    out._source = source || '__unknown__';
     return out;
   });
-  return { headers: hdrs, rows };
+  return { headers: hdrs, rows, source };
 }
 
 // Combine multiple parsed CSV results into the application's data model
@@ -247,10 +253,12 @@ function loadCombined(results){
   const combinedHeaders = [];
   const combinedRows = [];
   results.forEach(res => {
-    const { headers: hdrs, rows } = parseResultToRows(res);
+    const { headers: hdrs, rows, source } = parseResultToRows(res.result, res.source);
     hdrs.forEach(h => { if (!combinedHeaders.includes(h)) combinedHeaders.push(h); });
     rows.forEach(r => combinedRows.push(r));
   });
+  // make sure SOURCE_COL exists in headers and will be shown as a column
+  if (!combinedHeaders.includes(SOURCE_COL)) combinedHeaders.push(SOURCE_COL);
   if (!combinedRows.length) {
     alert('ไม่พบข้อมูลในไฟล์ CSV');
     return;
@@ -260,11 +268,15 @@ function loadCombined(results){
   data = combinedRows.map(row => {
     const out = {};
     headers.forEach(h => out[h] = row[h] ?? '');
+    // populate the SOURCE_COL from tagged _source if present
+    out[SOURCE_COL] = row._source || row[SOURCE_COL] || '__unknown__';
     out._norm = {};
     headers.forEach(h => {
       const k = detectHeaderKey(h) || null;
       if (k) out._norm[k] = String(out[h] ?? '').trim();
     });
+    // keep the original source accessible
+    out._source = row._source || out[SOURCE_COL];
     return out;
   });
 
@@ -275,16 +287,46 @@ function loadCombined(results){
   populateColumnSelect();
   populateDateFilter();
   populateZoneFilter();
+  populateSourceFilterAndTabs();
   renderTable(data);
 }
 
 function fetchAndParseAll(files){
   Promise.all(files.map(url => fetch(url)
     .then(r => { if(!r.ok) throw new Error(url + ' fetch failed: ' + r.status); return r.text(); })
-    .then(t => Papa.parse(t, { header: true, skipEmptyLines: true }))
+    .then(t => ({ result: Papa.parse(t, { header: true, skipEmptyLines: true }), source: url }))
   ))
   .then(results => loadCombined(results))
   .catch(err => alert('ไม่สามารถโหลดไฟล์ CSV: ' + err.message));
+}
+
+function populateSourceFilterAndTabs(){
+  if (!sourceFilter) return;
+  const seen = new Set();
+  const opts = [];
+  data.forEach(r => {
+    const s = r._source || r[SOURCE_COL] || '__unknown__';
+    if (!seen.has(s)) { seen.add(s); opts.push(s); }
+  });
+  sourceFilter.innerHTML = '';
+  const any = document.createElement('option'); any.value='__any__'; any.textContent='ทุกแหล่ง'; sourceFilter.appendChild(any);
+  opts.forEach(s => {
+    const o = document.createElement('option'); o.value = s; o.textContent = s; sourceFilter.appendChild(o);
+  });
+
+  // build tabs if container present
+  if (sourceTabs) {
+    sourceTabs.innerHTML = '';
+    const allBtn = document.createElement('button'); allBtn.type='button'; allBtn.textContent='ทั้งหมด'; allBtn.dataset.source='__any__';
+    allBtn.addEventListener('click', ()=>{ if(sourceFilter) sourceFilter.value='__any__'; applySearch(); });
+    sourceTabs.appendChild(allBtn);
+    opts.forEach(s => {
+      const b = document.createElement('button'); b.type='button'; b.textContent = s; b.dataset.source = s;
+      b.addEventListener('click', ()=>{ if(sourceFilter) sourceFilter.value = s; applySearch(); });
+      sourceTabs.appendChild(b);
+    });
+  }
+  if (sourceFilter) sourceFilter.addEventListener('change', ()=> applySearch());
 }
 
 function populateColumnSelect() {

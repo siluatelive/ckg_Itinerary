@@ -35,11 +35,17 @@
         <option value="__any__">ทุกคอลัมน์</option>
       </select>
 
+      <label for="sourceFilter">แหล่งข้อมูล:</label>
+      <select id="sourceFilter">
+        <option value="__any__">ทุกแหล่ง</option>
+      </select>
+
       <button id="clear">ล้าง</button>
     </section>
 
     <section id="stats" class="hidden"></section>
-
+    
+  <nav id="sourceTabs" class="source-tabs" aria-label="แหล่งข้อมูล"></nav>
     <section id="tableWrap">
       <table id="results">
         <thead id="thead"></thead>

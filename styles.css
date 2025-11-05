@@ -54,12 +54,15 @@ input:focus, select:focus{outline:2px solid rgba(15,98,254,0.12);border-color:va
 .input-row{display:flex;gap:8px;align-items:center}
 .input-row input{flex:1}
 
-/* Table cells: allow wrapping long text and breaking long words */
+/* Table cells: show full text and preserve newlines for readability */
 #results td, #results th{
-	white-space:normal!important;
-	word-break:break-word;
-	overflow-wrap:anywhere;
-	vertical-align:top;
+	/* preserve existing newlines and spacing, wrap at word boundaries */
+ 	white-space: pre-wrap !important;
+ 	word-break: break-word;
+ 	overflow-wrap: anywhere;
+ 	vertical-align: top;
+ 	line-height: 1.45;
+ 	padding: 12px 12px;
 }
 
 #results{width:100%;border-collapse:collapse;margin-top:12px;background:transparent}
@@ -70,7 +73,7 @@ input:focus, select:focus{outline:2px solid rgba(15,98,254,0.12);border-color:va
 
 .table-card{margin-top:18px;padding:8px}
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-#results{min-width:720px}
+#results{min-width:0}
 
 #stats{margin-top:8px;color:var(--muted)}
 .hidden{display:none}
@@ -98,7 +101,7 @@ mark{background:#fff19b;padding:0 4px;border-radius:3px}
 	.brand h1{font-size:18px}
 	.search-grid{grid-template-columns:1fr;gap:10px}
 	.search-grid .field.small{flex-direction:row;align-items:center;gap:8px}
-	#results{min-width:540px}
+	#results{min-width:0}
 	th.col-source, td.col-source{display:none}
 }
 

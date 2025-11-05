@@ -25,12 +25,16 @@ const zoneFilter = document.getElementById('zoneFilter');
 const placeFilter = document.getElementById('placeFilter');
 
 function showStats(rowsCount) {
+  if (!stats) return;
   stats.classList.remove('hidden');
   // Thai: แถวทั้งหมด / แสดงผลที่ตรงกัน
-  stats.textContent = `แถวทั้งหมด: ${rowsCount} — แสดงผลที่ตรงกัน: ${tbody.rows.length}`;
+  const shown = tbody ? tbody.rows.length : 0;
+  stats.textContent = `แถวทั้งหมด: ${rowsCount} — แสดงผลที่ตรงกัน: ${shown}`;
 }
 
 function renderTable(rows) {
+  // If the combined table elements are not present (we're using per-source tables), bail out
+  if (!thead || !tbody) return;
   // Render header
   thead.innerHTML = '';
   tbody.innerHTML = '';

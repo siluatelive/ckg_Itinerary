@@ -17,3 +17,25 @@ h1{margin-top:0}
 footer{margin-top:24px;color:#666;font-size:14px}
 
 mark{background: #ffea8a; padding:0 2px; border-radius:2px}
+
+/* Responsive tweaks: make controls stack on narrow screens and allow horizontal scroll for wide tables */
+@media (max-width: 720px) {
+	.controls { flex-direction: column; align-items: stretch; gap: 8px; }
+	.search { flex-direction: column; align-items: stretch; gap: 8px; }
+	#query { width: 100%; }
+	#columnSelect, #dateFilter, #placeFilter { width: 100%; max-width: 100%; }
+	#clear { align-self: flex-start; }
+
+	/* Allow table to scroll horizontally on small screens */
+	#tableWrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+	/* Prevent the table from shrinking too much; allow horizontal scrolling instead */
+	#results { min-width: 760px; }
+}
+
+/* Improve touch targets and spacing for mobile */
+button, select, input[type="checkbox"], input[type="file"], input[type="text"], #query, #placeFilter {
+	min-height: 40px;
+}
+
+/* Slightly larger mark highlight for readability */
+mark{background:#fff19b;padding:0 3px;border-radius:3px}

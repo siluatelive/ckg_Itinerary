@@ -155,6 +155,84 @@ function applySearch() {
   renderTable(filtered);
 }
 
+// Filter helper for a given set of rows (used to render per-source tables)
+function filterRowsForSource(rows){
+  const q = queryInput.value.trim();
+  const isWhole = wholeWord ? wholeWord.checked : false;
+  const qLower = q.toLowerCase();
+  const dateVal = dateFilter ? dateFilter.value : '__any__';
+  const zoneVal = zoneFilter ? zoneFilter.value : '__any__';
+  const placeVal = placeFilter ? placeFilter.value.trim().toLowerCase() : '';
+
+  return rows.filter(row => {
+    if (dateVal && dateVal !== '__any__'){
+      const rowDate = (row._norm && row._norm.date) ? row._norm.date : (row[headers[0]] || '');
+      if (String(rowDate).trim() !== String(dateVal).trim()) return false;
+    }
+    if (zoneVal && zoneVal !== '__any__'){
+      const rowZone = (row._norm && row._norm.zone) ? row._norm.zone : (row[headers[1]] || '');
+      if (String(rowZone).trim() !== String(zoneVal).trim()) return false;
+    }
+    if (placeVal){
+      const rp = (row._norm && row._norm.place) ? row._norm.place.toLowerCase() : '';
+      const matchPlaceAny = Object.keys(row).some(h => (String(row[h] || '').toLowerCase().includes(placeVal)));
+      if (!(rp.includes(placeVal) || matchPlaceAny)) return false;
+    }
+    if (!q) return true;
+    const searchIn = (h) => {
+      const v = (row[h] ?? '').toString();
+      if (isWhole) return v.toLowerCase() === qLower;
+      return v.toLowerCase().includes(qLower);
+    };
+    // search across the source's own headers
+    const hdrs = Object.keys(row).filter(k=>k !== '_norm' && k !== '_source');
+    return hdrs.some(h => searchIn(h));
+  });
+}
+
+function renderPerSourceTables(){
+  const container = document.getElementById('perSourceTables');
+  if (!container) return;
+  container.innerHTML = '';
+  // iterate sources in sourceRowsMap
+  Object.keys(sourceRowsMap).forEach(src => {
+    const hdrs = sourceHeadersMap[src] || [];
+    const rows = sourceRowsMap[src] || [];
+    const filtered = filterRowsForSource(rows);
+
+    const section = document.createElement('section');
+    section.className = 'source-section';
+    const title = document.createElement('h3');
+    title.textContent = src;
+    section.appendChild(title);
+
+    const tableWrap = document.createElement('div');
+    tableWrap.className = 'table-scroll';
+    const table = document.createElement('table');
+    table.className = 'source-table';
+    const theadEl = document.createElement('thead');
+    const tr = document.createElement('tr');
+    hdrs.forEach(h => { if (h === SOURCE_COL) return; const th = document.createElement('th'); th.textContent = h; tr.appendChild(th); });
+    theadEl.appendChild(tr);
+    table.appendChild(theadEl);
+
+    const tbodyEl = document.createElement('tbody');
+    filtered.forEach(r => {
+      const trr = document.createElement('tr');
+      hdrs.forEach(h => {
+        if (h === SOURCE_COL) return;
+        const td = document.createElement('td'); td.innerHTML = highlight(r[h] ?? '', queryInput.value); trr.appendChild(td);
+      });
+      trr.addEventListener('click', ()=> openDetailModal(r));
+      tbodyEl.appendChild(trr);
+    });
+    table.appendChild(tbodyEl);
+    tableWrap.appendChild(table);
+    section.appendChild(tableWrap);
+    container.appendChild(section);
+  });
+}
+
 function loadParsed(result) {
   // result.data is array of objects (if header) or arrays
   if (!result || !result.data) return;
@@ -370,6 +448,8 @@ function loadCombined(results){
   populateSourceFilterAndTabs();
   // set default active source/tab and render accordingly
   setCurrentSource('__any__');
+  // render per-source tables initially
+  renderPerSourceTables();
 }
 
 function fetchAndParseAll(files){
@@ -437,6 +517,8 @@ function setCurrentSource(src){
 
   // re-run search to render correct rows
   applySearch();
+  // also update per-source tables (apply same filters)
+  renderPerSourceTables();
 }
 
 function populateColumnSelect() {

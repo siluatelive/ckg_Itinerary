@@ -83,6 +83,9 @@ footer.site-footer{margin:18px 0;color:var(--muted);font-size:13px;text-align:ce
 
 mark{background:#fff19b;padding:0 4px;border-radius:3px}
 
+/* Emphasis for 'Must' labels */
+.must{color:#d32f2f;font-weight:700}
+
 /* Source tabs styling */
 .source-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .source-tabs button{background:#f8fafc;border:1px solid var(--border);padding:8px 12px;border-radius:999px;cursor:pointer;color:var(--muted)}

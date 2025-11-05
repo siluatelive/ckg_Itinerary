@@ -64,7 +64,7 @@ function renderTable(rows) {
       if (h === SOURCE_COL) return;
       const td = document.createElement('td');
       const cell = row[h] ?? '';
-      td.innerHTML = highlight(cell, document.getElementById('query').value);
+      td.innerHTML = renderCell(cell, document.getElementById('query').value, h);
       tr.appendChild(td);
     });
     // Attach click handler to open detail modal (mobile friendly)
@@ -91,9 +91,9 @@ function openDetailModal(row){
     // preserve original newlines and basic HTML
     const v = row[h] ?? '';
     // Use a container with pre-wrap to preserve newlines
-    const wrapper = document.createElement('div');
-    wrapper.style.whiteSpace = 'pre-wrap';
-    wrapper.innerHTML = escapeHtml(String(v));
+  const wrapper = document.createElement('div');
+  wrapper.style.whiteSpace = 'pre-wrap';
+  wrapper.innerHTML = renderCell(v, queryInput ? queryInput.value : '', h);
     dd.appendChild(wrapper);
     dl.appendChild(dt); dl.appendChild(dd);
   });
@@ -232,7 +232,7 @@ function renderPerSourceTables(){
       const trr = document.createElement('tr');
       hdrs.forEach(h => {
         if (h === SOURCE_COL) return;
-        const td = document.createElement('td'); td.innerHTML = highlight(r[h] ?? '', queryInput.value); trr.appendChild(td);
+        const td = document.createElement('td'); td.innerHTML = renderCell(r[h] ?? '', queryInput.value, h); trr.appendChild(td);
       });
       trr.addEventListener('click', ()=> openDetailModal(r));
       tbodyEl.appendChild(trr);
@@ -570,6 +570,28 @@ function highlight(text, q){
   }catch(e){
     return escapeHtml(text);
   }
+}
+
+// Render a cell's HTML with query highlighting and special emphasis for the word 'Must'
+function renderCell(text, q, headerName){
+  const raw = text == null ? '' : String(text);
+  // escape first
+  let out = escapeHtml(raw);
+  // apply query highlight if provided
+  if (q) {
+    try{
+      const esc = q.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&');
+      const re = new RegExp(esc, 'ig');
+      out = out.replace(re, match => `<mark>${escapeHtml(match)}</mark>`);
+    }catch(e){ /* ignore */ }
+  }
+  // emphasize the word 'Must' (case-insensitive) for specific columns
+  // apply for recommendation and place columns
+  const key = headerName && headerMap && headerMap[headerName] ? headerMap[headerName] : (headerName || '');
+  if (key === 'recommend' || key === 'place' || /แนะนำ|สถานที่/.test(headerName)){
+    out = out.replace(/\b(Must)\b/ig, (m, p1) => `<span class="must">${p1}</span>`);
+  }
+  return out;
 }
 
 // Note: file upload / "use included" UI removed — app always loads Book1.csv on page load

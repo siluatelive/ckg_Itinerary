@@ -1,62 +1,98 @@
 <html lang="th">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ค้นหาแผนการเดินทาง (CSV)</title>
-  <link rel="stylesheet" href="styles.css" />
-  <!-- Use PapaParse from CDN for robust CSV parsing -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-</head>
-<body>
-  <main>
-  <h1>ค้นหาแผนการเดินทางจากไฟล์ CSV</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="ค้นหาแผนการเดินทางจาก CSV — Chongqing Itinerary" />
+    <title>ค้นหาแผนการเดินทาง (CSV)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Use PapaParse from CDN for robust CSV parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <h1>Chongqing Itinerary</h1>
+          <p class="subtitle">แผนการเที่ยวฉงชิ่ง</p>
+        </div>
+        <nav class="top-actions" aria-label="เมนูการทำงาน">
+          <!-- Keep controls minimal in header; main filters below -->
+          <button id="clear" class="btn btn-ghost">ล้าง</button>
+        </nav>
+      </div>
+    </header>
 
-    <section class="search">
-      <input id="query" placeholder="พิมพ์เพื่อค้นหา (ค้นทุกคอลัมน์)" />
-      <label><input id="wholeWord" type="checkbox" /> ค้นทั้งคำ</label>
+    <main class="container">
+      <section class="card search-card" aria-labelledby="search-heading">
+        <h2 id="search-heading" class="sr-only">ค้นหา</h2>
 
-      <!-- New dedicated filters for travel plan CSV -->
-      <label for="dateFilter">วันที่:</label>
-      <select id="dateFilter">
-        <option value="__any__">ทุกวัน</option>
-      </select>
+        <form class="search-grid" onsubmit="return false;">
+          <div class="field full">
+            <label for="query" class="label">ค้นหา</label>
+            <input id="query" placeholder="พิมพ์เพื่อค้นหา (ค้นทุกคอลัมน์)" />
+          </div>
 
-      <label for="zoneFilter">โซน:</label>
-      <select id="zoneFilter">
-        <option value="__any__">ทุกโซน</option>
-      </select>
+          <div class="field small">
+            <label class="label"><input id="wholeWord" type="checkbox" /> ค้นทั้งคำ</label>
+          </div>
 
-      <label for="placeFilter">สถานที่:</label>
-      <input id="placeFilter" placeholder="กรองตามชื่อสถานที่" />
+          <div class="field">
+            <label for="dateFilter" class="label">วันที่</label>
+            <select id="dateFilter">
+              <option value="__any__">ทุกวัน</option>
+            </select>
+          </div>
 
-      <label for="columnSelect">คอลัมน์:</label>
-      <select id="columnSelect">
-        <option value="__any__">ทุกคอลัมน์</option>
-      </select>
+          <div class="field">
+            <label for="zoneFilter" class="label">โซน</label>
+            <select id="zoneFilter">
+              <option value="__any__">ทุกโซน</option>
+            </select>
+          </div>
 
-      <label for="sourceFilter">แหล่งข้อมูล:</label>
-      <select id="sourceFilter">
-        <option value="__any__">ทุกแหล่ง</option>
-      </select>
+          <div class="field">
+            <label for="placeFilter" class="label">สถานที่</label>
+            <input id="placeFilter" placeholder="กรองตามชื่อสถานที่" />
+          </div>
 
-      <button id="clear">ล้าง</button>
-    </section>
+          <div class="field">
+            <label for="columnSelect" class="label">คอลัมน์</label>
+            <select id="columnSelect">
+              <option value="__any__">ทุกคอลัมน์</option>
+            </select>
+          </div>
 
-    <section id="stats" class="hidden"></section>
-    
-  <nav id="sourceTabs" class="source-tabs" aria-label="แหล่งข้อมูล"></nav>
-    <section id="tableWrap">
-      <table id="results">
-        <thead id="thead"></thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </section>
+          <div class="field">
+            <label for="sourceFilter" class="label">แหล่งข้อมูล</label>
+            <select id="sourceFilter">
+              <option value="__any__">ทุกแหล่ง</option>
+            </select>
+          </div>
 
-    <footer>
-      <p>แอปแผนการเดินทาง</p>
-    </footer>
-  </main>
+        </form>
+      </section>
 
-  <script src="app.js"></script>
-</body>
+      <section id="stats" class="hidden" aria-live="polite"></section>
+
+      <nav id="sourceTabs" class="source-tabs" aria-label="แหล่งข้อมูล"></nav>
+
+      <section id="tableWrap" class="card table-card">
+        <div class="table-scroll">
+          <table id="results">
+            <thead id="thead"></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <p>แอปแผนการเดินทาง • สร้างด้วย CSV</p>
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
 </html>

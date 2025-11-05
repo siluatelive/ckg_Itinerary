@@ -1,51 +1,90 @@
-:root{--bg:#fafafa;--card:#fff;--accent:#0366d6}
+:root{
+	--bg:#f6f8fb;
+	--card:#ffffff;
+	--muted:#6b7280;
+	--accent:#0f62fe;
+	--accent-600:#0b55d1;
+	--border: #e6e9ef;
+	--shadow: 0 6px 18px rgba(12,23,50,0.06);
+}
+
 *{box-sizing:border-box}
-body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:#111}
-main{max-width:900px;margin:32px auto;padding:20px;background:transparent}
-h1{margin-top:0}
-.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.controls input[type=file]{border:1px solid #ddd;padding:6px}
-.or{color:#666;margin:0 6px}
-.search{margin:12px 0;display:flex;gap:12px;align-items:center}
-#query{flex:1;padding:8px;border:1px solid #ddd;border-radius:6px}
-#results{width:100%;border-collapse:collapse;margin-top:12px;background:var(--card);box-shadow:0 1px 0 rgba(0,0,0,0.03)}
-#results th,#results td{padding:8px;border:1px solid #eee;text-align:left}
-#results thead th{background:#f5f5f5}
-#tbody tr:nth-child(even){background:#fcfcfc}
-#stats{margin-top:8px;color:#333}
+html,body{height:100%}
+body{
+	font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+	margin:0;
+	background:var(--bg);
+	color:#0b1220;
+	-webkit-font-smoothing:antialiased;
+}
+
+.container{
+	max-width:1100px;
+	margin:28px auto;
+	padding:0 20px;
+}
+
+.site-header{
+	background: linear-gradient(90deg, rgba(15,98,254,0.06), rgba(15,98,254,0.02));
+	border-bottom:1px solid rgba(15,98,254,0.04);
+}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.brand h1{margin:0;font-size:20px}
+.brand .subtitle{margin:4px 0 0;color:var(--muted);font-size:13px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.search-card{margin:18px 0}
+
+.search-grid{display:grid;grid-template-columns:1fr 120px 160px;gap:12px;align-items:end}
+.search-grid .field{display:flex;flex-direction:column}
+.search-grid .field.small{align-self:center}
+.label{font-size:12px;color:var(--muted);margin-bottom:6px}
+
+input,select,button{font-family:inherit}
+input[type="text"], input, select{padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:transparent}
+input:focus, select:focus{outline:2px solid rgba(15,98,254,0.12);border-color:var(--accent-600)}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:1px solid transparent;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+
+#results{width:100%;border-collapse:collapse;margin-top:12px;background:transparent}
+#results th,#results td{padding:12px;border-bottom:1px solid var(--border);text-align:left}
+#results thead th{background:transparent;color:var(--muted);font-weight:600}
+#tbody tr{background:transparent}
+#tbody tr:nth-child(even){background:rgba(15,98,254,0.02)}
+
+.table-card{margin-top:18px;padding:8px}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#results{min-width:720px}
+
+#stats{margin-top:8px;color:var(--muted)}
 .hidden{display:none}
-footer{margin-top:24px;color:#666;font-size:14px}
 
-mark{background: #ffea8a; padding:0 2px; border-radius:2px}
+footer.site-footer{margin:18px 0;color:var(--muted);font-size:13px;text-align:center}
 
-/* Responsive tweaks: make controls stack on narrow screens and allow horizontal scroll for wide tables */
-@media (max-width: 720px) {
-	.controls { flex-direction: column; align-items: stretch; gap: 8px; }
-	.search { flex-direction: column; align-items: stretch; gap: 8px; }
-	#query { width: 100%; }
-	#columnSelect, #dateFilter, #placeFilter { width: 100%; max-width: 100%; }
-	#clear { align-self: flex-start; }
-
-	/* Allow table to scroll horizontally on small screens */
-	#tableWrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-	/* Prevent the table from shrinking too much; allow horizontal scrolling instead */
-	#results { min-width: 760px; }
-}
-
-/* Improve touch targets and spacing for mobile */
-button, select, input[type="checkbox"], input[type="file"], input[type="text"], #query, #placeFilter {
-	min-height: 40px;
-}
-
-/* Slightly larger mark highlight for readability */
-mark{background:#fff19b;padding:0 3px;border-radius:3px}
+mark{background:#fff19b;padding:0 4px;border-radius:3px}
 
 /* Source tabs styling */
-.source-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
-.source-tabs button{background:#f3f4f6;border:1px solid #e5e7eb;padding:6px 10px;border-radius:999px;cursor:pointer}
+.source-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.source-tabs button{background:#f8fafc;border:1px solid var(--border);padding:8px 12px;border-radius:999px;cursor:pointer;color:var(--muted)}
 .source-tabs button.active{background:var(--accent);color:#fff;border-color:transparent}
 
-/* Hide source column on small screens to reduce horizontal width */
-@media (max-width: 720px) {
-	th.col-source, td.col-source { display: none; }
+/* Accessibility helper */
+.sr-only{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+
+/* Responsive tweaks */
+@media (max-width: 880px){
+	.search-grid{grid-template-columns:1fr 120px;}
 }
+
+@media (max-width: 720px){
+	.container{margin:14px auto;padding:0 14px}
+	.header-inner{padding:12px 0}
+	.brand h1{font-size:18px}
+	.search-grid{grid-template-columns:1fr;gap:10px}
+	.search-grid .field.small{flex-direction:row;align-items:center;gap:8px}
+	#results{min-width:540px}
+	th.col-source, td.col-source{display:none}
+}
+

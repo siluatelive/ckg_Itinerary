@@ -94,11 +94,23 @@ function loadParsed(result) {
   // result.data is array of objects (if header) or arrays
   if (!result || !result.data) return;
   // PapaParse may include an extra empty row at end — filter
-  const parsed = result.data.filter(r => {
+  let parsed = result.data.filter(r => {
     if (!r) return false;
     // if r is array
     if (Array.isArray(r)) return r.some(v => v !== null && v !== '');
     return Object.values(r).some(v => v !== null && v !== '');
+  });
+  // Remove trailing/embedded metadata rows (the CSV contains another table later with headers like
+  // 'สถานที่ (พินภาษาจีน)', 'ค่าเข้าโดยประมาณ') that should not be treated as itinerary rows.
+  const metaKeywords = ['สถานที่ (พิน', 'ค่าเข้า', 'หมายเหตุ', 'พินภาษาจีน'];
+  parsed = parsed.filter(r => {
+    const vals = Array.isArray(r) ? r.map(String) : Object.values(r).map(String);
+    const joined = vals.join(' ').toLowerCase();
+    // if any meta keyword appears, drop the row
+    for (const k of metaKeywords) if (joined.includes(k)) return false;
+    // also drop rows where every cell matches a known header string (defensive)
+    if (headers && headers.length && vals.every(v => headers.includes(v))) return false;
+    return true;
   });
   if (!parsed.length) {
     alert('ไม่พบข้อมูลในไฟล์ CSV');

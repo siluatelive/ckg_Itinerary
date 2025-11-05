@@ -39,6 +39,8 @@ function renderTable(rows) {
   headers.forEach(h => {
     const th = document.createElement('th');
     th.textContent = h;
+    // mark the source column so CSS can hide it on mobile
+    if (h === SOURCE_COL) th.classList.add('col-source');
     tr.appendChild(th);
   });
   thead.appendChild(tr);
@@ -49,6 +51,7 @@ function renderTable(rows) {
     headers.forEach(h => {
       const td = document.createElement('td');
       const cell = row[h] ?? '';
+      if (h === SOURCE_COL) td.classList.add('col-source');
       td.innerHTML = highlight(cell, document.getElementById('query').value);
       tr.appendChild(td);
     });
@@ -317,7 +320,8 @@ function loadCombined(results){
   populateDateFilter();
   populateZoneFilter();
   populateSourceFilterAndTabs();
-  renderTable(data);
+  // set default active source/tab and render accordingly
+  setCurrentSource('__any__');
 }
 
 function fetchAndParseAll(files){

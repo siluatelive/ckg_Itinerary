@@ -44,3 +44,8 @@ mark{background:#fff19b;padding:0 3px;border-radius:3px}
 .source-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .source-tabs button{background:#f3f4f6;border:1px solid #e5e7eb;padding:6px 10px;border-radius:999px;cursor:pointer}
 .source-tabs button.active{background:var(--accent);color:#fff;border-color:transparent}
+
+/* Hide source column on small screens to reduce horizontal width */
+@media (max-width: 720px) {
+	th.col-source, td.col-source { display: none; }
+}

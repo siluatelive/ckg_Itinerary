@@ -155,13 +155,21 @@ function detectHeaderKey(h){
   if (s.includes('แนะนำ') || s.includes('recommend') || s.includes('must') || s.includes('try')) return 'recommend';
   return null;
 }
+// find the header name in `headers` that maps to a normalized key (e.g. 'date','zone')
+function findHeaderByKey(key){
+  for(const h of headers){
+    if(headerMap[h] === key) return h;
+  }
+  return null;
+}
 
 function populateDateFilter(){
   if (!dateFilter) return;
   const seen = new Set();
   const opts = [];
+  const hdr = findHeaderByKey('date') || headers[0];
   data.forEach(r => {
-    const d = (r._norm && r._norm.date) ? r._norm.date : (r[headers[0]] || '');
+    const d = (r._norm && r._norm.date) ? r._norm.date : (r[hdr] || '');
     if (!d) return;
     if (!seen.has(d)) { seen.add(d); opts.push(d); }
   });
@@ -177,8 +185,9 @@ function populateZoneFilter(){
   if (!zoneFilter) return;
   const seen = new Set();
   const opts = [];
+  const hdr = findHeaderByKey('zone') || (headers.length>1?headers[1]:headers[0]);
   data.forEach(r => {
-    const z = (r._norm && r._norm.zone) ? r._norm.zone : (r[headers[1]] || '');
+    const z = (r._norm && r._norm.zone) ? r._norm.zone : (r[hdr] || '');
     if (!z) return;
     if (!seen.has(z)) { seen.add(z); opts.push(z); }
   });

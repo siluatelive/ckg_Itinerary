@@ -430,7 +430,7 @@ function highlight(text, q){
 // Note: file upload / "use included" UI removed — app always loads Book1.csv on page load
 
 queryInput.addEventListener('input', () => applySearch());
-wholeWord.addEventListener('change', () => applySearch());
+if (wholeWord) wholeWord.addEventListener('change', () => applySearch());
 if (dateFilter) dateFilter.addEventListener('change', () => applySearch());
 if (zoneFilter) zoneFilter.addEventListener('change', () => applySearch());
 if (placeFilter) placeFilter.addEventListener('input', () => applySearch());
@@ -445,7 +445,7 @@ window.addEventListener('load', () => {
 const clearBtn = document.getElementById('clear');
 if (clearBtn) clearBtn.addEventListener('click', ()=>{
   queryInput.value = '';
-  wholeWord.checked = false;
+  if (wholeWord) wholeWord.checked = false;
   if (columnSelect) columnSelect.value = '__any__';
   if (dateFilter) dateFilter.value = '__any__';
   if (zoneFilter) zoneFilter.value = '__any__';

@@ -70,6 +70,9 @@ function renderTable(rows) {
     // Attach click handler to open detail modal (mobile friendly)
     tr.addEventListener('click', () => openDetailModal(row));
     tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') openDetailModal(row); });
+    // apply row-level emphasis class if row contains Must or Try
+    const rc = getRowEmphasis(row);
+    if (rc) tr.classList.add(rc);
     tbody.appendChild(tr);
   });
   showStats(data.length);
@@ -235,6 +238,9 @@ function renderPerSourceTables(){
         const td = document.createElement('td'); td.innerHTML = renderCell(r[h] ?? '', queryInput.value, h); trr.appendChild(td);
       });
       trr.addEventListener('click', ()=> openDetailModal(r));
+      // apply row-level emphasis class if row contains Must or Try
+      const rc2 = getRowEmphasis(r);
+      if (rc2) trr.classList.add(rc2);
       tbodyEl.appendChild(trr);
     });
     table.appendChild(tbodyEl);
@@ -590,8 +596,23 @@ function renderCell(text, q, headerName){
   const key = headerName && headerMap && headerMap[headerName] ? headerMap[headerName] : (headerName || '');
   if (key === 'recommend' || key === 'place' || /แนะนำ|สถานที่/.test(headerName)){
     out = out.replace(/\b(Must)\b/ig, (m, p1) => `<span class="must">${p1}</span>`);
+    out = out.replace(/\b(Try)\b/ig, (m, p1) => `<span class="try">${p1}</span>`);
   }
   return out;
+}
+
+// Determine if a row contains 'Must' or 'Try' (case-insensitive) in any of its fields.
+// Returns a CSS class name to apply to the row: 'row-must' | 'row-try' | ''
+function getRowEmphasis(row){
+  if (!row) return '';
+  let hasTry = false;
+  for (const k of Object.keys(row)){
+    if (k === '_norm' || k === '_source') continue;
+    const v = String(row[k] ?? '');
+    if (/\bMust\b/i.test(v)) return 'row-must';
+    if (/\bTry\b/i.test(v)) hasTry = true;
+  }
+  return hasTry ? 'row-try' : '';
 }
 
 // Note: file upload / "use included" UI removed — app always loads Book1.csv on page load

@@ -46,8 +46,10 @@ function renderTable(rows) {
   thead.appendChild(tr);
 
   // Render rows
-  rows.forEach(row => {
+  rows.forEach((row, rowIndex) => {
     const tr = document.createElement('tr');
+    tr.tabIndex = 0; // make row focusable for keyboard users
+    tr.classList.add('data-row');
     headers.forEach(h => {
       // Skip rendering the synthetic source column
       if (h === SOURCE_COL) return;
@@ -56,10 +58,55 @@ function renderTable(rows) {
       td.innerHTML = highlight(cell, document.getElementById('query').value);
       tr.appendChild(td);
     });
+    // Attach click handler to open detail modal (mobile friendly)
+    tr.addEventListener('click', () => openDetailModal(row));
+    tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') openDetailModal(row); });
     tbody.appendChild(tr);
   });
   showStats(data.length);
 }
+
+// Modal helpers: open/close detail view for a row
+const detailModal = document.getElementById('detailModal');
+const modalContent = document.getElementById('modalContent');
+const modalClose = document.getElementById('modalClose');
+
+function openDetailModal(row){
+  if (!detailModal || !modalContent) return;
+  // build a description list of header -> value
+  const dl = document.createElement('dl');
+  headers.forEach(h => {
+    if (h === SOURCE_COL) return; // skip source col
+    const dt = document.createElement('dt'); dt.textContent = h;
+    const dd = document.createElement('dd');
+    // preserve original newlines and basic HTML
+    const v = row[h] ?? '';
+    // Use a container with pre-wrap to preserve newlines
+    const wrapper = document.createElement('div');
+    wrapper.style.whiteSpace = 'pre-wrap';
+    wrapper.innerHTML = escapeHtml(String(v));
+    dd.appendChild(wrapper);
+    dl.appendChild(dt); dl.appendChild(dd);
+  });
+  modalContent.innerHTML = '';
+  modalContent.appendChild(dl);
+  detailModal.classList.remove('hidden');
+  detailModal.setAttribute('aria-hidden', 'false');
+  // focus close button for accessibility
+  if (modalClose) modalClose.focus();
+}
+
+function closeDetailModal(){
+  if (!detailModal) return;
+  detailModal.classList.add('hidden');
+  detailModal.setAttribute('aria-hidden', 'true');
+}
+
+if (modalClose) modalClose.addEventListener('click', closeDetailModal);
+// close when tapping outside modal-inner
+if (detailModal) detailModal.addEventListener('click', (e)=>{ if (e.target === detailModal) closeDetailModal(); });
+// close on Escape
+document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeDetailModal(); });
 
 function applySearch() {
   const q = queryInput.value.trim();

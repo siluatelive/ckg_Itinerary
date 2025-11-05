@@ -73,6 +73,16 @@
       </footer>
     </main>
 
-    <script src="app.js"></script>
+      <!-- Detail modal (opens on row tap) -->
+      <div id="detailModal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-inner" role="document">
+          <header class="modal-header">
+            <button id="modalClose" class="btn btn-ghost" aria-label="ปิด">ปิด</button>
+          </header>
+          <main id="modalContent" class="modal-content"></main>
+        </div>
+      </div>
+
+      <script src="app.js"></script>
   </body>
 </html>

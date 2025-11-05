@@ -355,7 +355,7 @@ function populateSourceFilterAndTabs(){
       sourceTabs.appendChild(b);
     });
   }
-  if (sourceFilter) sourceFilter.addEventListener('change', ()=> applySearch());
+  if (sourceFilter) sourceFilter.addEventListener('change', ()=> setCurrentSource(sourceFilter.value));
 }
 
 function setCurrentSource(src){

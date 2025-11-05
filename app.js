@@ -62,7 +62,7 @@ function renderTable(rows) {
 
 function applySearch() {
   const q = queryInput.value.trim();
-  const isWhole = wholeWord.checked;
+  const isWhole = wholeWord ? wholeWord.checked : false;
   const qLower = q.toLowerCase();
   const selected = columnSelect ? columnSelect.value : '__any__';
   const dateVal = dateFilter ? dateFilter.value : '__any__';

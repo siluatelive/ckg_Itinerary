@@ -54,12 +54,12 @@ input:focus, select:focus{outline:2px solid rgba(15,98,254,0.12);border-color:va
 .input-row{display:flex;gap:8px;align-items:center}
 .input-row input{flex:1}
 
-/* Table cells: show full text and preserve newlines for readability */
+/* Table cells: preserve original spacing/newlines and prevent wrapping so long text stays on one line (horizontal scroll) */
 #results td, #results th{
-	/* preserve existing newlines and spacing, wrap at word boundaries */
- 	white-space: pre-wrap !important;
- 	word-break: break-word;
- 	overflow-wrap: anywhere;
+ 	/* preserve newlines but do not wrap lines; table will scroll horizontally */
+ 	white-space: pre !important;
+ 	word-break: normal;
+ 	overflow-wrap: normal;
  	vertical-align: top;
  	line-height: 1.45;
  	padding: 12px 12px;
@@ -73,7 +73,8 @@ input:focus, select:focus{outline:2px solid rgba(15,98,254,0.12);border-color:va
 
 .table-card{margin-top:18px;padding:8px}
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-#results{min-width:0}
+/* Keep table width fixed to avoid responsive wrapping; allow horizontal scroll on small screens */
+#results{min-width:1200px}
 
 #stats{margin-top:8px;color:var(--muted)}
 .hidden{display:none}
@@ -101,7 +102,7 @@ mark{background:#fff19b;padding:0 4px;border-radius:3px}
 	.brand h1{font-size:18px}
 	.search-grid{grid-template-columns:1fr;gap:10px}
 	.search-grid .field.small{flex-direction:row;align-items:center;gap:8px}
-	#results{min-width:0}
-	th.col-source, td.col-source{display:none}
+	/* keep table min-width so content doesn't reflow; users can scroll horizontally */
+	#results{min-width:1200px}
 }
 

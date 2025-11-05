@@ -37,10 +37,10 @@ function renderTable(rows) {
   if (!headers.length) return;
   const tr = document.createElement('tr');
   headers.forEach(h => {
+    // Do not render the synthetic source column in the table display
+    if (h === SOURCE_COL) return;
     const th = document.createElement('th');
     th.textContent = h;
-    // mark the source column so CSS can hide it on mobile
-    if (h === SOURCE_COL) th.classList.add('col-source');
     tr.appendChild(th);
   });
   thead.appendChild(tr);
@@ -49,9 +49,10 @@ function renderTable(rows) {
   rows.forEach(row => {
     const tr = document.createElement('tr');
     headers.forEach(h => {
+      // Skip rendering the synthetic source column
+      if (h === SOURCE_COL) return;
       const td = document.createElement('td');
       const cell = row[h] ?? '';
-      if (h === SOURCE_COL) td.classList.add('col-source');
       td.innerHTML = highlight(cell, document.getElementById('query').value);
       tr.appendChild(td);
     });

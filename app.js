@@ -152,7 +152,9 @@ function applySearch() {
     }
     return headers.some(h => searchIn(h));
   });
-  renderTable(filtered);
+  // If per-source tables are present, update them instead of the combined table
+  if (document.getElementById('perSourceTables')) renderPerSourceTables();
+  else renderTable(filtered);
 }
 
 // Filter helper for a given set of rows (used to render per-source tables)
@@ -296,7 +298,9 @@ function loadParsed(result) {
   populateColumnSelect();
   populateDateFilter();
   populateZoneFilter();
-  renderTable(data);
+  // If per-source container exists, render per-source tables; otherwise render combined table
+  if (document.getElementById('perSourceTables')) renderPerSourceTables();
+  else renderTable(data);
 }
 
 function detectHeaderKey(h){
@@ -580,7 +584,8 @@ if (clearBtn) clearBtn.addEventListener('click', ()=>{
   if (dateFilter) dateFilter.value = '__any__';
   if (zoneFilter) zoneFilter.value = '__any__';
   if (placeFilter) placeFilter.value = '';
-  renderTable(data);
+  if (document.getElementById('perSourceTables')) renderPerSourceTables();
+  else renderTable(data);
 });
 // inline clear for query field (improves UX)
 const clearQueryBtn = document.getElementById('clearQuery');

@@ -13,14 +13,11 @@
   </head>
   <body>
     <header class="site-header">
-      <div class="container header-inner">
+        <div class="container header-inner">
         <div class="brand">
           <h1>Chongqing Itinerary</h1>
           <p class="subtitle">แผนการเที่ยวฉงชิ่ง</p>
         </div>
-        <nav class="top-actions" aria-label="เมนูการทำงาน">
-          <button id="clear" class="btn btn-ghost">ล้าง</button>
-        </nav>
       </div>
     </header>
 
@@ -31,7 +28,10 @@
         <form class="search-grid" onsubmit="applySearch(); return false;">
           <div class="field full">
             <label for="query" class="label">ค้นหา</label>
-            <input id="query" placeholder="พิมพ์เพื่อค้นหา" />
+            <div class="input-row">
+              <input id="query" placeholder="พิมพ์เพื่อค้นหา" />
+              <button id="clear" type="button" class="btn btn-ghost">ล้าง</button>
+            </div>
           </div>
 
           <div class="field small">

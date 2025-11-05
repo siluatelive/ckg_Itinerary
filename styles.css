@@ -1,0 +1,19 @@
+:root{--bg:#fafafa;--card:#fff;--accent:#0366d6}
+*{box-sizing:border-box}
+body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:#111}
+main{max-width:900px;margin:32px auto;padding:20px;background:transparent}
+h1{margin-top:0}
+.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.controls input[type=file]{border:1px solid #ddd;padding:6px}
+.or{color:#666;margin:0 6px}
+.search{margin:12px 0;display:flex;gap:12px;align-items:center}
+#query{flex:1;padding:8px;border:1px solid #ddd;border-radius:6px}
+#results{width:100%;border-collapse:collapse;margin-top:12px;background:var(--card);box-shadow:0 1px 0 rgba(0,0,0,0.03)}
+#results th,#results td{padding:8px;border:1px solid #eee;text-align:left}
+#results thead th{background:#f5f5f5}
+#tbody tr:nth-child(even){background:#fcfcfc}
+#stats{margin-top:8px;color:#333}
+.hidden{display:none}
+footer{margin-top:24px;color:#666;font-size:14px}
+
+mark{background: #ffea8a; padding:0 2px; border-radius:2px}

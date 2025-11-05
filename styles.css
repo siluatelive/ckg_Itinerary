@@ -28,7 +28,8 @@ body{
 	background: linear-gradient(90deg, rgba(15,98,254,0.06), rgba(15,98,254,0.02));
 	border-bottom:1px solid rgba(15,98,254,0.04);
 }
-.header-inner{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.header-inner{display:flex;align-items:center;justify-content:center;padding:18px 0}
+.header-inner .brand{text-align:center}
 .brand h1{margin:0;font-size:20px}
 .brand .subtitle{margin:4px 0 0;color:var(--muted);font-size:13px}
 

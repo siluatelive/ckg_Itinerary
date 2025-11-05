@@ -8,7 +8,7 @@ const dataFiles = ['Book1.csv', 'places_extra.csv'];
 const SOURCE_COL = 'แหล่งข้อมูล';
 // Friendly labels for source filenames (used in the UI). Update these to change displayed labels.
 const sourceLabelMap = {
-  'Book1.csv': 'Book1',
+  'Book1.csv': 'สถานที่',
   'places_extra.csv': 'ข้อมูลเสริม'
 };
 const sourceFilter = document.getElementById('sourceFilter');

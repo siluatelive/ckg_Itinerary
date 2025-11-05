@@ -10,6 +10,7 @@ const thead = document.getElementById('thead');
 const tbody = document.getElementById('tbody');
 const stats = document.getElementById('stats');
 const dateFilter = document.getElementById('dateFilter');
+const zoneFilter = document.getElementById('zoneFilter');
 const placeFilter = document.getElementById('placeFilter');
 
 function showStats(rowsCount) {
@@ -51,6 +52,7 @@ function applySearch() {
   const qLower = q.toLowerCase();
   const selected = columnSelect ? columnSelect.value : '__any__';
   const dateVal = dateFilter ? dateFilter.value : '__any__';
+  const zoneVal = zoneFilter ? zoneFilter.value : '__any__';
   const placeVal = placeFilter ? placeFilter.value.trim().toLowerCase() : '';
 
   const filtered = data.filter(row => {
@@ -58,6 +60,11 @@ function applySearch() {
     if (dateVal && dateVal !== '__any__') {
       const rowDate = (row._norm && row._norm.date) ? row._norm.date : (row[headers[0]] || '');
       if (String(rowDate).trim() !== String(dateVal).trim()) return false;
+    }
+    // Apply zone filter if present
+    if (zoneVal && zoneVal !== '__any__') {
+      const rowZone = (row._norm && row._norm.zone) ? row._norm.zone : (row[headers[1]] || '');
+      if (String(rowZone).trim() !== String(zoneVal).trim()) return false;
     }
     // Apply place filter if present
     if (placeVal) {
@@ -133,6 +140,7 @@ function loadParsed(result) {
   });
   populateColumnSelect();
   populateDateFilter();
+  populateZoneFilter();
   renderTable(data);
 }
 
@@ -143,6 +151,7 @@ function detectHeaderKey(h){
   if (s.includes('สถานที่') || s.includes('place') || s.includes('สถาน')) return 'place';
   if (s.includes('รายละเอียด') || s.includes('detail')) return 'details';
   if (s.includes('การเดินทาง') || s.includes('เดินทาง') || s.includes('trav')) return 'transport';
+  if (s.includes('โซน') || s.includes('zone')) return 'zone';
   if (s.includes('แนะนำ') || s.includes('recommend') || s.includes('must') || s.includes('try')) return 'recommend';
   return null;
 }
@@ -161,6 +170,22 @@ function populateDateFilter(){
   const any = document.createElement('option'); any.value='__any__'; any.textContent='ทุกวัน'; dateFilter.appendChild(any);
   opts.forEach(d => {
     const o = document.createElement('option'); o.value = d; o.textContent = d; dateFilter.appendChild(o);
+  });
+}
+
+function populateZoneFilter(){
+  if (!zoneFilter) return;
+  const seen = new Set();
+  const opts = [];
+  data.forEach(r => {
+    const z = (r._norm && r._norm.zone) ? r._norm.zone : (r[headers[1]] || '');
+    if (!z) return;
+    if (!seen.has(z)) { seen.add(z); opts.push(z); }
+  });
+  zoneFilter.innerHTML = '';
+  const any = document.createElement('option'); any.value='__any__'; any.textContent='ทุกโซน'; zoneFilter.appendChild(any);
+  opts.forEach(z => {
+    const o = document.createElement('option'); o.value = z; o.textContent = z; zoneFilter.appendChild(o);
   });
 }
 
@@ -220,6 +245,7 @@ function highlight(text, q){
 queryInput.addEventListener('input', () => applySearch());
 wholeWord.addEventListener('change', () => applySearch());
 if (dateFilter) dateFilter.addEventListener('change', () => applySearch());
+if (zoneFilter) zoneFilter.addEventListener('change', () => applySearch());
 if (placeFilter) placeFilter.addEventListener('input', () => applySearch());
 
 // On load, attempt to fetch Book1.csv silently
@@ -235,6 +261,7 @@ if (clearBtn) clearBtn.addEventListener('click', ()=>{
   wholeWord.checked = false;
   if (columnSelect) columnSelect.value = '__any__';
   if (dateFilter) dateFilter.value = '__any__';
+  if (zoneFilter) zoneFilter.value = '__any__';
   if (placeFilter) placeFilter.value = '';
   renderTable(data);
 });

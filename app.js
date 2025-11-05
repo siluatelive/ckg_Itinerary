@@ -6,6 +6,11 @@ let headerMap = {}; // map original header -> normalized key (date/place/details
 const dataFiles = ['Book1.csv', 'places_extra.csv'];
 // Synthetic source column header (Thai)
 const SOURCE_COL = 'แหล่งข้อมูล';
+// Friendly labels for source filenames (used in the UI). Update these to change displayed labels.
+const sourceLabelMap = {
+  'Book1.csv': 'Book1',
+  'places_extra.csv': 'ข้อมูลเสริม'
+};
 const sourceFilter = document.getElementById('sourceFilter');
 const sourceTabs = document.getElementById('sourceTabs');
 
@@ -480,7 +485,8 @@ function populateSourceFilterAndTabs(){
   sourceFilter.innerHTML = '';
   const any = document.createElement('option'); any.value='__any__'; any.textContent='ทุกแหล่ง'; sourceFilter.appendChild(any);
   opts.forEach(s => {
-    const o = document.createElement('option'); o.value = s; o.textContent = s; sourceFilter.appendChild(o);
+    const label = sourceLabelMap[s] || s;
+    const o = document.createElement('option'); o.value = s; o.textContent = label; sourceFilter.appendChild(o);
   });
 
   // build tabs if container present
@@ -490,7 +496,8 @@ function populateSourceFilterAndTabs(){
     allBtn.addEventListener('click', ()=>{ setCurrentSource('__any__'); });
     sourceTabs.appendChild(allBtn);
     opts.forEach(s => {
-      const b = document.createElement('button'); b.type='button'; b.textContent = s; b.dataset.source = s;
+      const label = sourceLabelMap[s] || s;
+      const b = document.createElement('button'); b.type='button'; b.textContent = label; b.dataset.source = s;
       b.addEventListener('click', ()=>{ setCurrentSource(s); });
       sourceTabs.appendChild(b);
     });

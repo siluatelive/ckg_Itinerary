@@ -54,12 +54,12 @@ input:focus, select:focus{outline:2px solid rgba(15,98,254,0.12);border-color:va
 .input-row{display:flex;gap:8px;align-items:center}
 .input-row input{flex:1}
 
-/* Table cells: preserve original spacing/newlines and prevent wrapping so long text stays on one line (horizontal scroll) */
+/* Table cells: allow wrapping (pre-wrap) so text flows on small screens. The modal still provides a full-screen view for long content. */
 #results td, #results th{
- 	/* preserve newlines but do not wrap lines; table will scroll horizontally */
- 	white-space: pre !important;
- 	word-break: normal;
- 	overflow-wrap: normal;
+ 	/* preserve newlines but allow wrapping; let words break when needed */
+ 	white-space: pre-wrap !important;
+ 	word-break: break-word;
+ 	overflow-wrap: anywhere;
  	vertical-align: top;
  	line-height: 1.45;
  	padding: 12px 12px;
@@ -73,8 +73,8 @@ input:focus, select:focus{outline:2px solid rgba(15,98,254,0.12);border-color:va
 
 .table-card{margin-top:18px;padding:8px}
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-/* Keep table width fixed to avoid responsive wrapping; allow horizontal scroll on small screens */
-#results{min-width:1200px}
+/* Remove forced min-width so table can shrink and wrap on small screens; keep horizontal scroll if content still overflows */
+/* No min-width set to allow responsive wrapping */
 
 #stats{margin-top:8px;color:var(--muted)}
 .hidden{display:none}

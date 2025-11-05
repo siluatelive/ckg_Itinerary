@@ -447,17 +447,17 @@ function loadCombined(results){
   });
 
   // default to 'all sources'
-  currentSource = '__any__';
+  // default to first source (Book1.csv) if available, otherwise 'all sources'
+  const defaultSource = (results && results.length && results[0].source) ? results[0].source : '__any__';
+  currentSource = defaultSource;
   headers = unionHeaders.slice();
 
   populateColumnSelect();
   populateDateFilter();
   populateZoneFilter();
   populateSourceFilterAndTabs();
-  // set default active source/tab and render accordingly
-  setCurrentSource('__any__');
-  // render per-source tables initially
-  renderPerSourceTables();
+  // set default active source/tab and render accordingly (Book1 by default)
+  setCurrentSource(currentSource);
 }
 
 function fetchAndParseAll(files){

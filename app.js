@@ -2,6 +2,8 @@
 let data = [];
 let headers = [];
 let headerMap = {}; // map original header -> normalized key (date/place/details/transport/recommend)
+// Files to load and merge
+const dataFiles = ['Book1.csv', 'places_extra.csv'];
 
 const columnSelect = document.getElementById('columnSelect');
 const queryInput = document.getElementById('query');
@@ -215,13 +217,73 @@ function parseCsvText(text) {
   loadParsed(result);
 }
 
-function fetchAndParse(url) {
-  fetch(url)
-    .then(r => {
-      if (!r.ok) throw new Error('Fetch failed: ' + r.status);
-      return r.text();
-    })
-    .then(t => parseCsvText(t))
+// Helper: convert a Papa.parse result into header array and row objects
+function parseResultToRows(result){
+  if(!result || !result.data) return { headers: [], rows: [] };
+  // basic cleanup: remove empty rows
+  let parsed = result.data.filter(r => {
+    if (!r) return false;
+    return Object.values(r).some(v => v !== null && v !== '');
+  });
+  // filter obvious metadata/footer rows
+  const metaKeywords = ['สถานที่ (พิน', 'ค่าเข้า', 'หมายเหตุ', 'พินภาษาจีน'];
+  parsed = parsed.filter(r => {
+    const vals = Object.values(r).map(String);
+    const joined = vals.join(' ').toLowerCase();
+    for (const k of metaKeywords) if (joined.includes(k)) return false;
+    return true;
+  });
+  const hdrs = result.meta && result.meta.fields ? result.meta.fields.map(f => String(f)) : (parsed.length ? Object.keys(parsed[0]) : []);
+  const rows = parsed.map(r => {
+    const out = {};
+    hdrs.forEach(h => out[h] = r[h] ?? '');
+    return out;
+  });
+  return { headers: hdrs, rows };
+}
+
+// Combine multiple parsed CSV results into the application's data model
+function loadCombined(results){
+  const combinedHeaders = [];
+  const combinedRows = [];
+  results.forEach(res => {
+    const { headers: hdrs, rows } = parseResultToRows(res);
+    hdrs.forEach(h => { if (!combinedHeaders.includes(h)) combinedHeaders.push(h); });
+    rows.forEach(r => combinedRows.push(r));
+  });
+  if (!combinedRows.length) {
+    alert('ไม่พบข้อมูลในไฟล์ CSV');
+    return;
+  }
+  headers = combinedHeaders;
+  // normalize rows and build _norm
+  data = combinedRows.map(row => {
+    const out = {};
+    headers.forEach(h => out[h] = row[h] ?? '');
+    out._norm = {};
+    headers.forEach(h => {
+      const k = detectHeaderKey(h) || null;
+      if (k) out._norm[k] = String(out[h] ?? '').trim();
+    });
+    return out;
+  });
+
+  // build headerMap
+  headerMap = {};
+  headers.forEach(h => headerMap[h] = detectHeaderKey(h) || null);
+
+  populateColumnSelect();
+  populateDateFilter();
+  populateZoneFilter();
+  renderTable(data);
+}
+
+function fetchAndParseAll(files){
+  Promise.all(files.map(url => fetch(url)
+    .then(r => { if(!r.ok) throw new Error(url + ' fetch failed: ' + r.status); return r.text(); })
+    .then(t => Papa.parse(t, { header: true, skipEmptyLines: true }))
+  ))
+  .then(results => loadCombined(results))
   .catch(err => alert('ไม่สามารถโหลดไฟล์ CSV: ' + err.message));
 }
 
@@ -271,8 +333,8 @@ if (placeFilter) placeFilter.addEventListener('input', () => applySearch());
 
 // On load, attempt to fetch Book1.csv silently
 window.addEventListener('load', () => {
-  // Always try to load the attached Book1.csv in the same folder
-  fetchAndParse('Book1.csv');
+  // Load and merge the main itinerary CSV and any extras
+  fetchAndParseAll(dataFiles);
 });
 
 // wire additional controls

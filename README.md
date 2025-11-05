@@ -1,33 +1,38 @@
-# CSV Search App (GitHub Pages demo)
+# แอปค้นหาแผนการเดินทางจาก CSV (รองรับภาษาไทย)
 
-This repository contains a small client-side web app that can load a CSV file and provide quick search across all columns. It's intended to be deployed using GitHub Pages (by serving the `docs/` folder).
+เว็บแอปตัวเล็กนี้อ่านไฟล์ CSV ของแผนการเดินทาง (`Book1.csv`) และให้คุณค้นแผนการเดินทางตามวันที่ สถานที่ การเดินทาง และรายละเอียดอื่น ๆ โดยรองรับภาษาไทยใน UI และการแม็ปหัวคอลัมน์
 
-Files of interest (served at the site root when Pages uses `docs/`):
+ไฟล์ที่สำคัญ:
 
-- `docs/index.html` – main app
-- `docs/app.js` – client-side logic (uses PapaParse via CDN)
-- `docs/styles.css` – minimal styling
-- `docs/Book1.csv` – sample CSV included for demo
+- `index.html` – ส่วนติดต่อผู้ใช้
+- `app.js` – ตรรกะฝั่งไคลเอนต์ (ใช้ PapaParse จาก CDN)
+- `styles.css` – สไตล์
+- `Book1.csv` – ตัวอย่างไฟล์ CSV ที่แนบมา
 
-How to use locally:
+คุณสมบัติหลัก:
 
-1. Open the `docs/index.html` in a browser (easiest by running a local server):
+- โหลดไฟล์ `Book1.csv` อัตโนมัติเมื่อเปิดหน้า (โปรดวางไฟล์ `Book1.csv` ไว้ในรากโฟลเดอร์ของโปรเจค)
+- แอปนี้ไม่รองรับการอัปโหลดไฟล์อื่น — จะใช้ `Book1.csv` เท่านั้น
+- ค้นหาข้อความได้ทั้งทุกคอลัมน์ (หรือจำกัดคอลัมน์) พร้อมตัวเลือก "ค้นทั้งคำ"
+- ฟิลเตอร์เฉพาะ: เลือกวันที่จาก dropdown (เติมอัตโนมัติจาก CSV) และกรองตามชื่อสถานที่
+- ผลลัพธ์จะแสดงและไฮไลต์คำที่ตรงกัน
+
+รันบนเครื่อง (local):
+
+เปิดเทอร์มินัลในโฟลเดอร์โปรเจค แล้วรันเซิร์ฟเวอร์ HTTP แบบง่ายและเปิดเบราว์เซอร์ (บางเบราว์เซอร์จะบล็อก fetch จาก file://):
 
 ```bash
-python3 -m http.server --directory docs 8000
-# then open http://localhost:8000 in a browser
+python3 -m http.server 8000
+# แล้วเปิด http://localhost:8000 ในเบราว์เซอร์
 ```
 
-2. You can either use the included `Book1.csv` (click the "Use included Book1.csv" button) or upload your own CSV file using the file picker.
+หมายเหตุการใช้งาน:
 
-Deploy to GitHub Pages (quick):
+- แอปใช้ PapaParse (จาก CDN) เพื่ออ่าน CSV อย่างทนทาน (รองรับฟิลด์ที่มีเครื่องหมายคำพูด คอมม่าในฟิลด์ ฯลฯ)
+- การแม็ปหัวคอลัมน์: แอปจะตรวจหาชื่อหัวคอลัมน์ทั่วไปทั้งภาษาไทยและอังกฤษ (เช่น "วันที่", "สถานที่", "รายละเอียด", "การเดินทาง", "แนะนำ") เพื่อเติมฟิลเตอร์เฉพาะอย่างวันที่และสถานที่ หากหัวคอลัมน์ของคุณต่างจากนี้ แอปยังคงอ่านได้และคุณสามารถค้นโดยเลือกคอลัมน์ที่ตรงกัน
 
-1. Commit and push this repository to GitHub.
-2. In the repository Settings → Pages, set the Source to the branch `main` (or your branch) and the folder to `/docs`.
-3. Save — Pages will publish the site. The site URL will be shown in the Settings page.
+ความปลอดภัย:
 
-Alternative: use a `gh-pages` branch or Actions if you prefer automated deployments.
+- หลีกเลี่ยงการอัปโหลดไฟล์ CSV ที่มีข้อมูลลับไปยังไซต์สาธารณะ แอปทำงานทั้งหมดในเบราว์เซอร์ ไม่มีการอัปโหลดข้อมูลไปยังเซิร์ฟเวอร์
 
-Notes:
-- The app uses PapaParse (included from CDN) so it handles quoted values and common CSV edge cases.
-- Do not commit private or sensitive CSV data to a public repository.
+If you prefer English docs, the original README explanation is still present in the repo history.

@@ -1,33 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CSV Search App</title>
+  <title>ค้นหาแผนการเดินทาง (CSV)</title>
   <link rel="stylesheet" href="styles.css" />
   <!-- Use PapaParse from CDN for robust CSV parsing -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
   <main>
-    <h1>CSV Search App</h1>
-
-    <section class="controls">
-      <label for="fileInput">Load CSV file (or use included Book1.csv):</label>
-      <input id="fileInput" type="file" accept=".csv" />
-
-      <div class="or">— OR —</div>
-      <button id="useDefault">Use included Book1.csv</button>
-    </section>
+  <h1>ค้นหาแผนการเดินทางจากไฟล์ CSV</h1>
 
     <section class="search">
-      <input id="query" placeholder="Type to search (matches any column)" />
-      <label><input id="wholeWord" type="checkbox" /> Whole word</label>
-      <label for="columnSelect">Column:</label>
-      <select id="columnSelect">
-        <option value="__any__">Any column</option>
+      <input id="query" placeholder="พิมพ์เพื่อค้นหา (ค้นทุกคอลัมน์)" />
+      <label><input id="wholeWord" type="checkbox" /> ค้นทั้งคำ</label>
+
+      <!-- New dedicated filters for travel plan CSV -->
+      <label for="dateFilter">วันที่:</label>
+      <select id="dateFilter">
+        <option value="__any__">ทุกวัน</option>
       </select>
-      <button id="clear">Clear</button>
+
+      <label for="placeFilter">สถานที่:</label>
+      <input id="placeFilter" placeholder="กรองตามชื่อสถานที่" />
+
+      <label for="columnSelect">คอลัมน์:</label>
+      <select id="columnSelect">
+        <option value="__any__">ทุกคอลัมน์</option>
+      </select>
+
+      <button id="clear">ล้าง</button>
     </section>
 
     <section id="stats" class="hidden"></section>
@@ -40,7 +43,7 @@
     </section>
 
     <footer>
-      <p>Built to demo client-side CSV search and easy GitHub Pages deployment.</p>
+      <p>แอปแผนการเดินทาง</p>
     </footer>
   </main>
 

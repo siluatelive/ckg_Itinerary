@@ -1,20 +1,21 @@
 // app.js — client-side CSV loader + search using PapaParse
 let data = [];
 let headers = [];
+let headerMap = {}; // map original header -> normalized key (date/place/details/transport/recommend)
 
 const columnSelect = document.getElementById('columnSelect');
-
-const fileInput = document.getElementById('fileInput');
-const useDefault = document.getElementById('useDefault');
 const queryInput = document.getElementById('query');
 const wholeWord = document.getElementById('wholeWord');
 const thead = document.getElementById('thead');
 const tbody = document.getElementById('tbody');
 const stats = document.getElementById('stats');
+const dateFilter = document.getElementById('dateFilter');
+const placeFilter = document.getElementById('placeFilter');
 
 function showStats(rowsCount) {
   stats.classList.remove('hidden');
-  stats.textContent = `Rows: ${rowsCount} — Showing ${tbody.rows.length} matched rows`;
+  // Thai: แถวทั้งหมด / แสดงผลที่ตรงกัน
+  stats.textContent = `แถวทั้งหมด: ${rowsCount} — แสดงผลที่ตรงกัน: ${tbody.rows.length}`;
 }
 
 function renderTable(rows) {
@@ -46,14 +47,29 @@ function renderTable(rows) {
 
 function applySearch() {
   const q = queryInput.value.trim();
-  if (!q) {
-    renderTable(data);
-    return;
-  }
   const isWhole = wholeWord.checked;
   const qLower = q.toLowerCase();
   const selected = columnSelect ? columnSelect.value : '__any__';
+  const dateVal = dateFilter ? dateFilter.value : '__any__';
+  const placeVal = placeFilter ? placeFilter.value.trim().toLowerCase() : '';
+
   const filtered = data.filter(row => {
+    // Apply date filter if present
+    if (dateVal && dateVal !== '__any__') {
+      const rowDate = (row._norm && row._norm.date) ? row._norm.date : (row[headers[0]] || '');
+      if (String(rowDate).trim() !== String(dateVal).trim()) return false;
+    }
+    // Apply place filter if present
+    if (placeVal) {
+      const rp = (row._norm && row._norm.place) ? row._norm.place.toLowerCase() : '';
+      const matchPlaceAny = headers.some(h => (String(row[h] || '').toLowerCase().includes(placeVal)));
+      if (!(rp.includes(placeVal) || matchPlaceAny)) return false;
+    }
+
+    // If no query, row passed filters — include
+    if (!q) return true;
+
+    // Otherwise apply text query across selected column(s)
     const searchIn = (h) => {
       const v = (row[h] ?? '').toString();
       if (isWhole) return v.toLowerCase() === qLower;
@@ -71,27 +87,81 @@ function loadParsed(result) {
   // result.data is array of objects (if header) or arrays
   if (!result || !result.data) return;
   // PapaParse may include an extra empty row at end — filter
-  const parsed = result.data.filter(r => Object.values(r).some(v => v !== null && v !== ''));
+  const parsed = result.data.filter(r => {
+    if (!r) return false;
+    // if r is array
+    if (Array.isArray(r)) return r.some(v => v !== null && v !== '');
+    return Object.values(r).some(v => v !== null && v !== '');
+  });
   if (!parsed.length) {
-    alert('No rows parsed from CSV');
+    alert('ไม่พบข้อมูลในไฟล์ CSV');
     return;
   }
   // If parsed rows are arrays, convert to objects using first row
   if (Array.isArray(parsed[0]) && result.meta && result.meta.fields === undefined) {
     // first row assumed to be header
     const headerRow = parsed[0];
-    headers = headerRow;
+    headers = headerRow.map(h => String(h));
     data = parsed.slice(1).map(arr => {
       const obj = {};
-      headerRow.forEach((h, i) => obj[h] = arr[i] ?? '');
+      headers.forEach((h, i) => obj[h] = arr[i] ?? '');
       return obj;
     });
   } else {
-    headers = result.meta.fields || Object.keys(parsed[0]);
+    headers = result.meta && result.meta.fields ? result.meta.fields.map(f => String(f)) : Object.keys(parsed[0]);
     data = parsed.map(r => r);
   }
+
+  // Build headerMap (map long header names to normalized keys for easier filters)
+  headerMap = {};
+  headers.forEach(h => {
+    const key = detectHeaderKey(h) || null;
+    headerMap[h] = key;
+  });
+
+  // Normalize rows: add a _norm map with keys like date/place/details/transport/recommend
+  data = data.map(row => {
+    const out = {};
+    // keep original column keyed values
+    headers.forEach(h => out[h] = row[h] ?? '');
+    out._norm = {};
+    headers.forEach(h => {
+      const k = headerMap[h];
+      if (k) out._norm[k] = String(row[h] ?? '').trim();
+    });
+    return out;
+  });
   populateColumnSelect();
+  populateDateFilter();
   renderTable(data);
+}
+
+function detectHeaderKey(h){
+  if (!h) return null;
+  const s = String(h).toLowerCase();
+  if (s.includes('วันที่') || s.includes('date') || s.includes('🗓')) return 'date';
+  if (s.includes('สถานที่') || s.includes('place') || s.includes('สถาน')) return 'place';
+  if (s.includes('รายละเอียด') || s.includes('detail')) return 'details';
+  if (s.includes('การเดินทาง') || s.includes('เดินทาง') || s.includes('trav')) return 'transport';
+  if (s.includes('แนะนำ') || s.includes('recommend') || s.includes('must') || s.includes('try')) return 'recommend';
+  return null;
+}
+
+function populateDateFilter(){
+  if (!dateFilter) return;
+  const seen = new Set();
+  const opts = [];
+  data.forEach(r => {
+    const d = (r._norm && r._norm.date) ? r._norm.date : (r[headers[0]] || '');
+    if (!d) return;
+    if (!seen.has(d)) { seen.add(d); opts.push(d); }
+  });
+  // Clear and add default
+  dateFilter.innerHTML = '';
+  const any = document.createElement('option'); any.value='__any__'; any.textContent='ทุกวัน'; dateFilter.appendChild(any);
+  opts.forEach(d => {
+    const o = document.createElement('option'); o.value = d; o.textContent = d; dateFilter.appendChild(o);
+  });
 }
 
 function parseCsvText(text) {
@@ -106,7 +176,7 @@ function fetchAndParse(url) {
       return r.text();
     })
     .then(t => parseCsvText(t))
-    .catch(err => alert('Could not load CSV: ' + err.message));
+  .catch(err => alert('ไม่สามารถโหลดไฟล์ CSV: ' + err.message));
 }
 
 function populateColumnSelect() {
@@ -115,7 +185,7 @@ function populateColumnSelect() {
   columnSelect.innerHTML = '';
   const any = document.createElement('option');
   any.value = '__any__';
-  any.textContent = 'Any column';
+  any.textContent = 'ทุกคอลัมน์';
   columnSelect.appendChild(any);
   headers.forEach(h => {
     const opt = document.createElement('option');
@@ -145,24 +215,12 @@ function highlight(text, q){
   }
 }
 
-fileInput.addEventListener('change', (ev) => {
-  const f = ev.target.files && ev.target.files[0];
-  if (!f) return;
-  Papa.parse(f, {
-    header: true,
-    skipEmptyLines: true,
-    complete: (res) => loadParsed(res),
-    error: (err) => alert('Parse error: ' + err.message)
-  });
-});
-
-useDefault.addEventListener('click', () => {
-  // Try to fetch docs/Book1.csv (relative path)
-  fetchAndParse('Book1.csv');
-});
+// Note: file upload / "use included" UI removed — app always loads Book1.csv on page load
 
 queryInput.addEventListener('input', () => applySearch());
 wholeWord.addEventListener('change', () => applySearch());
+if (dateFilter) dateFilter.addEventListener('change', () => applySearch());
+if (placeFilter) placeFilter.addEventListener('input', () => applySearch());
 
 // On load, attempt to fetch Book1.csv silently
 window.addEventListener('load', () => {
@@ -176,6 +234,8 @@ if (clearBtn) clearBtn.addEventListener('click', ()=>{
   queryInput.value = '';
   wholeWord.checked = false;
   if (columnSelect) columnSelect.value = '__any__';
+  if (dateFilter) dateFilter.value = '__any__';
+  if (placeFilter) placeFilter.value = '';
   renderTable(data);
 });
 if (columnSelect) columnSelect.addEventListener('change', ()=> applySearch());

@@ -9,6 +9,11 @@ const SOURCE_COL = 'แหล่งข้อมูล';
 const sourceFilter = document.getElementById('sourceFilter');
 const sourceTabs = document.getElementById('sourceTabs');
 
+// Maps for per-source data
+const sourceHeadersMap = {}; // source -> headers array
+const sourceRowsMap = {}; // source -> rows array
+let currentSource = '__any__';
+
 const columnSelect = document.getElementById('columnSelect');
 const queryInput = document.getElementById('query');
 const wholeWord = document.getElementById('wholeWord');
@@ -61,7 +66,10 @@ function applySearch() {
   const zoneVal = zoneFilter ? zoneFilter.value : '__any__';
   const placeVal = placeFilter ? placeFilter.value.trim().toLowerCase() : '';
 
-  const filtered = data.filter(row => {
+  // pick base rows depending on current source
+  const baseRows = (currentSource === '__any__') ? data : (sourceRowsMap[currentSource] || []);
+
+  const filtered = baseRows.filter(row => {
     // Apply date filter if present
     if (dateVal && dateVal !== '__any__') {
       const rowDate = (row._norm && row._norm.date) ? row._norm.date : (row[headers[0]] || '');
@@ -186,7 +194,9 @@ function populateDateFilter(){
   const seen = new Set();
   const opts = [];
   const hdr = findHeaderByKey('date') || headers[0];
-  data.forEach(r => {
+  // choose dataset depending on currentSource
+  const rowsSource = (currentSource === '__any__') ? data : (sourceRowsMap[currentSource] || []);
+  rowsSource.forEach(r => {
     const d = (r._norm && r._norm.date) ? r._norm.date : (r[hdr] || '');
     if (!d) return;
     if (!seen.has(d)) { seen.add(d); opts.push(d); }
@@ -204,7 +214,8 @@ function populateZoneFilter(){
   const seen = new Set();
   const opts = [];
   const hdr = findHeaderByKey('zone') || (headers.length>1?headers[1]:headers[0]);
-  data.forEach(r => {
+  const rowsSource = (currentSource === '__any__') ? data : (sourceRowsMap[currentSource] || []);
+  rowsSource.forEach(r => {
     const z = (r._norm && r._norm.zone) ? r._norm.zone : (r[hdr] || '');
     if (!z) return;
     if (!seen.has(z)) { seen.add(z); opts.push(z); }
@@ -252,8 +263,14 @@ function parseResultToRows(result, source){
 function loadCombined(results){
   const combinedHeaders = [];
   const combinedRows = [];
+  // clear maps
+  Object.keys(sourceHeadersMap).forEach(k=>delete sourceHeadersMap[k]);
+  Object.keys(sourceRowsMap).forEach(k=>delete sourceRowsMap[k]);
   results.forEach(res => {
     const { headers: hdrs, rows, source } = parseResultToRows(res.result, res.source);
+    // record per-source
+    sourceHeadersMap[source] = hdrs.slice();
+    sourceRowsMap[source] = rows.map(r => Object.assign({}, r));
     hdrs.forEach(h => { if (!combinedHeaders.includes(h)) combinedHeaders.push(h); });
     rows.forEach(r => combinedRows.push(r));
   });
@@ -263,26 +280,38 @@ function loadCombined(results){
     alert('ไม่พบข้อมูลในไฟล์ CSV');
     return;
   }
-  headers = combinedHeaders;
-  // normalize rows and build _norm
-  data = combinedRows.map(row => {
+  // combined headers used when viewing all sources
+  const unionHeaders = combinedHeaders;
+
+  // prepare combined data rows
+  const combined = combinedRows.map(row => {
     const out = {};
-    headers.forEach(h => out[h] = row[h] ?? '');
-    // populate the SOURCE_COL from tagged _source if present
+    unionHeaders.forEach(h => out[h] = row[h] ?? '');
     out[SOURCE_COL] = row._source || row[SOURCE_COL] || '__unknown__';
     out._norm = {};
-    headers.forEach(h => {
+    unionHeaders.forEach(h => {
       const k = detectHeaderKey(h) || null;
       if (k) out._norm[k] = String(out[h] ?? '').trim();
     });
-    // keep the original source accessible
     out._source = row._source || out[SOURCE_COL];
     return out;
   });
 
-  // build headerMap
+  // build headerMap for union headers
   headerMap = {};
-  headers.forEach(h => headerMap[h] = detectHeaderKey(h) || null);
+  unionHeaders.forEach(h => headerMap[h] = detectHeaderKey(h) || null);
+
+  // set global combined dataset
+  data = combined;
+
+  // ensure each sourceHeadersMap includes SOURCE_COL
+  Object.keys(sourceHeadersMap).forEach(src => {
+    if (!sourceHeadersMap[src].includes(SOURCE_COL)) sourceHeadersMap[src].push(SOURCE_COL);
+  });
+
+  // default to 'all sources'
+  currentSource = '__any__';
+  headers = unionHeaders.slice();
 
   populateColumnSelect();
   populateDateFilter();
@@ -318,15 +347,44 @@ function populateSourceFilterAndTabs(){
   if (sourceTabs) {
     sourceTabs.innerHTML = '';
     const allBtn = document.createElement('button'); allBtn.type='button'; allBtn.textContent='ทั้งหมด'; allBtn.dataset.source='__any__';
-    allBtn.addEventListener('click', ()=>{ if(sourceFilter) sourceFilter.value='__any__'; applySearch(); });
+    allBtn.addEventListener('click', ()=>{ setCurrentSource('__any__'); });
     sourceTabs.appendChild(allBtn);
     opts.forEach(s => {
       const b = document.createElement('button'); b.type='button'; b.textContent = s; b.dataset.source = s;
-      b.addEventListener('click', ()=>{ if(sourceFilter) sourceFilter.value = s; applySearch(); });
+      b.addEventListener('click', ()=>{ setCurrentSource(s); });
       sourceTabs.appendChild(b);
     });
   }
   if (sourceFilter) sourceFilter.addEventListener('change', ()=> applySearch());
+}
+
+function setCurrentSource(src){
+  currentSource = src || '__any__';
+  // update active tab styles
+  if (sourceTabs) {
+    Array.from(sourceTabs.children).forEach(btn => {
+      if (btn.dataset && btn.dataset.source === currentSource) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+  }
+  // update sourceFilter select to match
+  if (sourceFilter) sourceFilter.value = currentSource;
+
+  // set headers depending on source
+  if (currentSource === '__any__') {
+    // union view
+    headers = Object.keys(headerMap).length ? Object.keys(headerMap) : headers;
+  } else {
+    headers = (sourceHeadersMap[currentSource] || []).slice();
+  }
+
+  // repopulate column select & filters for the active dataset
+  populateColumnSelect();
+  populateDateFilter();
+  populateZoneFilter();
+
+  // re-run search to render correct rows
+  applySearch();
 }
 
 function populateColumnSelect() {

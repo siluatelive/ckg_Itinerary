@@ -350,6 +350,8 @@ function detectHeaderKey(h){
   const s = String(h).toLowerCase();
   if (s.includes('วันที่') || s.includes('date') || s.includes('🗓')) return 'date';
   if (s.includes('สถานที่') || s.includes('place') || s.includes('สถาน')) return 'place';
+  // Additional patterns for place names (Thai/Chinese pinyin headers)
+  if (s.includes('ชื่อสถานที่') || s.includes('คำอ่าน') || s.includes('พินอิน') || s.includes('ชื่อ')) return 'place';
   if (s.includes('รายละเอียด') || s.includes('detail')) return 'details';
   if (s.includes('การเดินทาง') || s.includes('เดินทาง') || s.includes('trav')) return 'transport';
   if (s.includes('โซน') || s.includes('zone')) return 'zone';

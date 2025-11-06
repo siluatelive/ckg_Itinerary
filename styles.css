@@ -106,6 +106,12 @@ tr.row-try td, .row-try td{color:#1976d2}
 /* Responsive tweaks */
 @media (max-width: 880px){
 	.search-grid{grid-template-columns:minmax(0,1fr) 120px;}
+
+	/* also hide non-essential columns for slightly larger small screens (phones with high DPR) */
+	#results th[class^="col-"], #results td[class^="col-"] { display:table-cell; }
+	#results th.col-other, #results td.col-other,
+	.source-table th.col-other, .source-table td.col-other { display:none !important; }
+
 }
 
 @media (max-width: 720px){
@@ -164,4 +170,3 @@ tr.row-try td, .row-try td{color:#1976d2}
 .modal.source-extra .modal-content th,.modal.source-extra .modal-content td{white-space:normal;word-break:break-word;overflow-wrap:anywhere;padding:8px}
 .modal.source-extra .modal-content img{max-width:100%;height:auto;display:block;margin:8px 0}
 .modal.source-extra .modal-content pre{white-space:pre-wrap}
-

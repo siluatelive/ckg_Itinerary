@@ -116,6 +116,12 @@ tr.row-try td, .row-try td{color:#1976d2}
 	.search-grid .field.small{flex-direction:row;align-items:center;gap:8px}
  	/* allow the results table to shrink on small screens to avoid pushing content off-screen */
  	#results{min-width:0; width:100%}
+
+	/* On small screens show only essential columns: date, zone, place. Hide others. */
+	/* Classes are added to th/td as col-date / col-zone / col-place / col-other */
+	#results th[class^="col-"], #results td[class^="col-"] { display:table-cell; }
+	#results th.col-other, #results td.col-other,
+	.source-table th.col-other, .source-table td.col-other { display:none; }
 }
 
 /* Modal (detail view) */

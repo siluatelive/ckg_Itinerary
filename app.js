@@ -49,7 +49,10 @@ function renderTable(rows) {
     // Do not render the synthetic source column in the table display
     if (h === SOURCE_COL) return;
     const th = document.createElement('th');
+    const key = (headerMap && headerMap[h]) ? headerMap[h] : 'other';
     th.textContent = h;
+    // add a semantic class for responsive hiding (e.g. col-date, col-place)
+    th.classList.add('col-' + key);
     tr.appendChild(th);
   });
   thead.appendChild(tr);
@@ -64,6 +67,9 @@ function renderTable(rows) {
       if (h === SOURCE_COL) return;
       const td = document.createElement('td');
       const cell = row[h] ?? '';
+      // attach a column class so CSS can hide/show columns responsively
+      const key = (headerMap && headerMap[h]) ? headerMap[h] : 'other';
+      td.classList.add('col-' + key);
       td.innerHTML = renderCell(cell, document.getElementById('query').value, h);
       tr.appendChild(td);
     });
@@ -236,7 +242,14 @@ function renderPerSourceTables(){
     table.className = 'source-table';
     const theadEl = document.createElement('thead');
     const tr = document.createElement('tr');
-    hdrs.forEach(h => { if (h === SOURCE_COL) return; const th = document.createElement('th'); th.textContent = h; tr.appendChild(th); });
+    hdrs.forEach(h => {
+      if (h === SOURCE_COL) return;
+      const th = document.createElement('th');
+      const key = (headerMap && headerMap[h]) ? headerMap[h] : 'other';
+      th.textContent = h;
+      th.classList.add('col-' + key);
+      tr.appendChild(th);
+    });
     theadEl.appendChild(tr);
     table.appendChild(theadEl);
 
@@ -245,7 +258,11 @@ function renderPerSourceTables(){
       const trr = document.createElement('tr');
       hdrs.forEach(h => {
         if (h === SOURCE_COL) return;
-        const td = document.createElement('td'); td.innerHTML = renderCell(r[h] ?? '', queryInput.value, h); trr.appendChild(td);
+        const td = document.createElement('td');
+        const key = (headerMap && headerMap[h]) ? headerMap[h] : 'other';
+        td.classList.add('col-' + key);
+        td.innerHTML = renderCell(r[h] ?? '', queryInput.value, h);
+        trr.appendChild(td);
       });
       trr.addEventListener('click', ()=> openDetailModal(r));
       // apply row-level emphasis class if row contains Must or Try

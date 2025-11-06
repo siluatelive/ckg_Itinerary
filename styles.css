@@ -120,7 +120,7 @@ tr.row-try td, .row-try td{color:#1976d2}
 /* Modal (detail view) */
 .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,11,28,0.6);z-index:1200}
 .modal.hidden{display:none}
-.modal-inner{background:var(--card);width:auto;max-width:95vw;min-width:320px;height:auto;max-height:90vh;margin:0;border-radius:0;padding:16px;box-shadow:var(--shadow);overflow:visible}
+.modal-inner{background:var(--card);width:auto;max-width:95vw;min-width:320px;height:auto;max-height:90vh;margin:0;border-radius:12px;padding:16px;box-shadow:var(--shadow);overflow:visible;box-sizing:border-box}
 .modal-header{display:flex;justify-content:flex-end}
 .modal-content{padding:6px 4px}
 .modal-content dl{margin:0}
@@ -148,9 +148,11 @@ tr.row-try td, .row-try td{color:#1976d2}
 	max-height:90vh;
 	border-radius:12px;
 	padding:12px;
+	box-sizing:border-box;
 }
 .modal.source-extra .modal-inner .modal-content{padding:8px}
-.modal.source-extra .modal-content table{width:100%;table-layout:fixed;border-collapse:collapse}
+.modal.source-extra .modal-content{overflow:auto}
+.modal.source-extra .modal-content table{width:100%;table-layout:auto;border-collapse:collapse}
 .modal.source-extra .modal-content th,.modal.source-extra .modal-content td{white-space:normal;word-break:break-word;overflow-wrap:anywhere;padding:8px}
 .modal.source-extra .modal-content img{max-width:100%;height:auto;display:block;margin:8px 0}
 .modal.source-extra .modal-content pre{white-space:pre-wrap}

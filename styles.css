@@ -131,3 +131,9 @@ tr.row-try td, .row-try td{color:#1976d2}
   .modal-inner{width:90%;height:80%;border-radius:12px}
 }
 
+/* Modal footer centered at bottom */
+.modal-inner{display:flex;flex-direction:column}
+.modal-content{flex:1;overflow:auto}
+.modal-footer{display:flex;justify-content:center;padding:12px 0;border-top:1px solid var(--border);background:transparent;}
+.modal-footer .btn{min-width:120px}
+

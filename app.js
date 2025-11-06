@@ -122,9 +122,11 @@ function openDetailModal(row){
       const textVal = String(v || '');
   // Only show copy button for Chinese text or likely pinyin (Latin letters with spaces)
   const hasChinese = /[\u4e00-\u9fff]/.test(textVal);
-  const hasLatin = /[A-Za-z\u00C0-\u017F]/.test(textVal);
-  const hasSpace = /\s/.test(textVal);
-  if (key === 'place' && (hasChinese || (hasLatin && hasSpace))) {
+  // pinyin commonly appears in parentheses like (Lǐzǐbà Zhàn) or after a dash ' - Lǐzǐbà Zhàn'
+  const pinyinInParens = /\([A-Za-z\u00C0-\u017F\sˇ́̀̄̇̄ǎěīūǘǐńḿ]+\)/.test(textVal);
+  const pinyinAfterDash = /[-–—]\s*[A-Za-z\u00C0-\u017F\sˇ́̀̄̇̄ǎěīūǘǐńḿ]+/.test(textVal);
+  // Show copy button only when place contains Chinese characters and a pinyin part recognizable
+  if (key === 'place' && hasChinese && (pinyinInParens || pinyinAfterDash)) {
         const copyBtn = document.createElement('button');
         copyBtn.type = 'button';
         copyBtn.className = 'btn btn-ghost btn-small';

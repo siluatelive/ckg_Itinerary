@@ -134,13 +134,14 @@ function openDetailModal(row){
         copyBtn.textContent = 'คัดลอกชื่อสถานที่';
         copyBtn.setAttribute('aria-label', 'คัดลอกชื่อสถานที่');
         copyBtn.addEventListener('click', async (e) => {
-          try {
+            try {
+            const copyText = extractChinesePinyin(textVal) || textVal;
             if (navigator.clipboard && navigator.clipboard.writeText) {
-              await navigator.clipboard.writeText(textVal);
+              await navigator.clipboard.writeText(copyText);
             } else {
               // fallback
               const ta = document.createElement('textarea');
-              ta.value = textVal;
+              ta.value = copyText;
               document.body.appendChild(ta);
               ta.select();
               document.execCommand('copy');
@@ -334,6 +335,24 @@ function enforceMobileCompact(){
 window.addEventListener('resize', enforceMobileCompact);
 // also call once immediately in case tables already present
 window.addEventListener('load', enforceMobileCompact);
+
+// Extract Chinese + pinyin segment from a place string. Returns the segment or empty string.
+function extractChinesePinyin(text){
+  if (!text) return '';
+  const s = String(text).trim();
+  // 1) look for parentheses containing both Chinese and Latin (pinyin)
+  const parenRe = /\(([^)]+)\)/g;
+  let m;
+  while ((m = parenRe.exec(s)) !== null){
+    const inside = m[1].trim();
+    if (/[\u4e00-\u9fff]/.test(inside) && /[A-Za-z\u00C0-\u017F]/.test(inside)) return inside;
+  }
+  // 2) look for pattern: Chinese chars possibly followed by dash+Latin pinyin
+  const pat = /[\u4e00-\u9fff]+(?:\s*[-–—]\s*[A-Za-z\u00C0-\u017F\sˇ́̀̄̇ǎěīūǘǐńḿ]+)?/;
+  const found = s.match(pat);
+  if (found) return found[0].trim();
+  return '';
+}
 
 function loadParsed(result) {
   // result.data is array of objects (if header) or arrays

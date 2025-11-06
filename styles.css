@@ -172,5 +172,13 @@ tr.row-try td, .row-try td{color:#1976d2}
 .modal.source-extra .modal-content pre{white-space:pre-wrap}
 
 /* JS fallback: when body has .mobile-compact, hide non-essential columns regardless of media queries */
-.mobile-compact #results th.col-other, .mobile-compact #results td.col-other,
-.mobile-compact .source-table th.col-other, .mobile-compact .source-table td.col-other { display:none !important; }
+.mobile-compact #results th, .mobile-compact #results td,
+.mobile-compact .source-table th, .mobile-compact .source-table td { display:none !important; }
+
+/* show only date / zone / place columns in compact mode */
+.mobile-compact #results th.col-date, .mobile-compact #results td.col-date,
+.mobile-compact #results th.col-zone, .mobile-compact #results td.col-zone,
+.mobile-compact #results th.col-place, .mobile-compact #results td.col-place,
+.mobile-compact .source-table th.col-date, .mobile-compact .source-table td.col-date,
+.mobile-compact .source-table th.col-zone, .mobile-compact .source-table td.col-zone,
+.mobile-compact .source-table th.col-place, .mobile-compact .source-table td.col-place { display:table-cell !important; }

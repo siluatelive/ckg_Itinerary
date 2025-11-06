@@ -116,6 +116,22 @@ function openDetailModal(row){
   wrapper.style.whiteSpace = 'pre-wrap';
   wrapper.innerHTML = renderCell(v, queryInput ? queryInput.value : '', h);
     dd.appendChild(wrapper);
+    // If this header maps to a place and contains Chinese characters, add an Amap search link
+    try {
+      const key = headerMap && headerMap[h] ? headerMap[h] : null;
+      const textVal = String(v || '');
+      if (key === 'place' && /[\u4e00-\u9fff]/.test(textVal)) {
+        const amapLink = document.createElement('a');
+        const amapUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(textVal);
+        amapLink.href = amapUrl;
+        amapLink.target = '_blank';
+        amapLink.rel = 'noopener noreferrer';
+        amapLink.className = 'btn btn-ghost btn-small';
+        amapLink.style.marginLeft = '8px';
+        amapLink.textContent = 'เปิดใน Amap';
+        dd.appendChild(amapLink);
+      }
+    } catch (e) { /* ignore errors */ }
     dl.appendChild(dt); dl.appendChild(dd);
   });
   modalContent.innerHTML = '';

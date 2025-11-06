@@ -82,6 +82,8 @@ function renderTable(rows) {
     tbody.appendChild(tr);
   });
   showStats(data.length);
+  // enforce JS fallback for mobile compact mode (in case media queries don't trigger on some devices)
+  if (typeof enforceMobileCompact === 'function') enforceMobileCompact();
 }
 
 // Modal helpers: open/close detail view for a row
@@ -275,7 +277,23 @@ function renderPerSourceTables(){
     section.appendChild(tableWrap);
     container.appendChild(section);
   });
+  // also enforce mobile compact after rendering per-source tables
+  if (typeof enforceMobileCompact === 'function') enforceMobileCompact();
 }
+
+// JS fallback to hide non-essential columns on devices that don't trigger media queries
+function enforceMobileCompact(){
+  try{
+    const shouldCompact = window.innerWidth <= 880;
+    if (shouldCompact) document.body.classList.add('mobile-compact');
+    else document.body.classList.remove('mobile-compact');
+  }catch(e){ /* ignore */ }
+}
+
+// keep fallback in sync on resize
+window.addEventListener('resize', enforceMobileCompact);
+// also call once immediately in case tables already present
+window.addEventListener('load', enforceMobileCompact);
 
 function loadParsed(result) {
   // result.data is array of objects (if header) or arrays

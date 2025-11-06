@@ -170,3 +170,7 @@ tr.row-try td, .row-try td{color:#1976d2}
 .modal.source-extra .modal-content th,.modal.source-extra .modal-content td{white-space:normal;word-break:break-word;overflow-wrap:anywhere;padding:8px}
 .modal.source-extra .modal-content img{max-width:100%;height:auto;display:block;margin:8px 0}
 .modal.source-extra .modal-content pre{white-space:pre-wrap}
+
+/* JS fallback: when body has .mobile-compact, hide non-essential columns regardless of media queries */
+.mobile-compact #results th.col-other, .mobile-compact #results td.col-other,
+.mobile-compact .source-table th.col-other, .mobile-compact .source-table td.col-other { display:none !important; }

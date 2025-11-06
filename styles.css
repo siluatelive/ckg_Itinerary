@@ -118,9 +118,9 @@ tr.row-try td, .row-try td{color:#1976d2}
 }
 
 /* Modal (detail view) */
-.modal{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:rgba(3,11,28,0.6);z-index:1200}
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,11,28,0.6);z-index:1200}
 .modal.hidden{display:none}
-.modal-inner{background:var(--card);width:100%;height:100%;max-width:980px;margin:0;border-radius:0;padding:16px;box-shadow:var(--shadow);overflow:auto}
+.modal-inner{background:var(--card);width:100%;height:auto;max-width:980px;max-height:90vh;margin:0;border-radius:0;padding:16px;box-shadow:var(--shadow);overflow:visible}
 .modal-header{display:flex;justify-content:flex-end}
 .modal-content{padding:6px 4px}
 .modal-content dl{margin:0}
@@ -128,17 +128,17 @@ tr.row-try td, .row-try td{color:#1976d2}
 .modal-content dd{margin:6px 0 12px;white-space:pre-wrap}
 
 @media(min-width:720px){
-  .modal-inner{width:90%;height:80%;border-radius:12px}
+	.modal-inner{width:90%;height:auto;max-height:80vh;border-radius:12px}
 }
 
 /* Modal footer centered at bottom */
 .modal-inner{display:flex;flex-direction:column}
-.modal-content{flex:1;overflow:auto}
+.modal-content{flex:0 1 auto;overflow:auto;max-height:calc(90vh - 120px)}
 .modal-footer{display:flex;justify-content:center;padding:12px 0;border-top:1px solid var(--border);background:transparent;}
 .modal-footer .btn{min-width:120px}
 
 /* Responsive tweaks for 'ข้อมูลเสริม' (places_extra) modal content */
-.modal.source-extra .modal-inner{max-width:100%;height:100%;border-radius:0;padding:12px}
+.modal.source-extra .modal-inner{max-width:100%;height:auto;max-height:90vh;border-radius:0;padding:12px}
 .modal.source-extra .modal-inner .modal-content{padding:8px}
 .modal.source-extra .modal-content table{width:100%;table-layout:fixed;border-collapse:collapse}
 .modal.source-extra .modal-content th,.modal.source-extra .modal-content td{white-space:normal;word-break:break-word;overflow-wrap:anywhere;padding:8px}

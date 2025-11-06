@@ -85,6 +85,16 @@ const modalClose = document.getElementById('modalClose');
 
 function openDetailModal(row){
   if (!detailModal || !modalContent) return;
+  // mark modal with source class for source-specific styling (e.g., places_extra => 'source-extra')
+  if (row && row._source) {
+    if (row._source === 'places_extra.csv' || row._source === 'places_extra') {
+      detailModal.classList.add('source-extra');
+    } else {
+      detailModal.classList.remove('source-extra');
+    }
+  } else {
+    detailModal.classList.remove('source-extra');
+  }
   // build a description list of header -> value
   const dl = document.createElement('dl');
   headers.forEach(h => {

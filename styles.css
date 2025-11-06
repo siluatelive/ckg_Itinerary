@@ -139,7 +139,16 @@ tr.row-try td, .row-try td{color:#1976d2}
 .modal-footer .btn{min-width:120px}
 
 /* Responsive tweaks for 'ข้อมูลเสริม' (places_extra) modal content */
-.modal.source-extra .modal-inner{max-width:98vw;width:98vw;height:auto;max-height:90vh;border-radius:0;padding:12px}
+.modal.source-extra .modal-inner{
+	/* Use the same centered adaptive sizing as the default modal */
+	width:auto;
+	max-width:95vw;
+	min-width:320px;
+	height:auto;
+	max-height:90vh;
+	border-radius:12px;
+	padding:12px;
+}
 .modal.source-extra .modal-inner .modal-content{padding:8px}
 .modal.source-extra .modal-content table{width:100%;table-layout:fixed;border-collapse:collapse}
 .modal.source-extra .modal-content th,.modal.source-extra .modal-content td{white-space:normal;word-break:break-word;overflow-wrap:anywhere;padding:8px}

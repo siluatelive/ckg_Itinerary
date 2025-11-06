@@ -120,7 +120,11 @@ function openDetailModal(row){
     try {
       const key = headerMap && headerMap[h] ? headerMap[h] : null;
       const textVal = String(v || '');
-      if (key === 'place' && textVal.trim()) {
+  // Only show copy button for Chinese text or likely pinyin (Latin letters with spaces)
+  const hasChinese = /[\u4e00-\u9fff]/.test(textVal);
+  const hasLatin = /[A-Za-z\u00C0-\u017F]/.test(textVal);
+  const hasSpace = /\s/.test(textVal);
+  if (key === 'place' && (hasChinese || (hasLatin && hasSpace))) {
         const copyBtn = document.createElement('button');
         copyBtn.type = 'button';
         copyBtn.className = 'btn btn-ghost btn-small';
